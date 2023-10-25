@@ -1,0 +1,149 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Mime;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Module.Access.Models.Request;
+using Module.Access.Models.Response;
+using Module.Access.Services.Interfaces;
+using Swashbuckle.AspNetCore.Annotations;
+
+
+namespace Module.Access.Controllers
+{
+    [ApiController]
+    [ApiExplorerSettings(GroupName = "Access")]
+    [Route("api/[controller]")]
+    public class AuthController : BaseController
+    {
+        private readonly IAuthService _authService;
+        public AuthController(IAuthService authService)
+        {
+            _authService = authService;
+        }
+
+
+        [AllowAnonymous]
+        [SwaggerOperation(
+            Summary = "Authenticates a user and generate JWT Token",
+            Description = "Authenticates a user and generate JWT Token",
+            OperationId = "auth.login",
+            Tags = new[] { "AuthEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<LoginResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPost("Login")]
+        public async Task<ActionResult<ApiResponse<LoginResponse>>> LoginAsync([FromBody] LoginRequest request)
+        {
+            var loginResponse = await _authService.LoginAsync(request);
+            return HandleResult(loginResponse);
+        }
+
+
+        [AllowAnonymous]
+        [SwaggerOperation(
+            Summary = "Initiate Forgot Password process",
+            Description = "This endpoint intiate a processes to reset a user password if forgotten",
+            OperationId = "auth.forgotpassword",
+            Tags = new[] { "PasswordEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPost("ForgotPassword")]
+        public async Task<ActionResult<BaseResponse>> ForgotPasswordAsync([FromBody] ForgotPasswordRequest request)
+        {
+            var forgotResponse = await _authService.ForgotPasswordAsync(request);
+            return HandleResult(forgotResponse);
+        }
+
+
+        [AllowAnonymous]
+        [SwaggerOperation(
+        Summary = "Verify OTP and return reset password token",
+        Description = "This endpoint verifies an OTP",
+        OperationId = "auth.verifyotp",
+        Tags = new[] { "PasswordEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPost("VerifyOtp")]
+        public async Task<ActionResult<ApiResponse<string>>> VerifyResetOtpAsync([FromBody] VerifyOtpRequest request)
+        {
+            var verifyResponse = await _authService.VerifyResetOtpAsync(request);
+            return HandleResult(verifyResponse);
+        }
+
+
+        [AllowAnonymous]
+        [SwaggerOperation(
+            Summary = "Set a new Password",
+            Description = "This endpoint reset user password with new one",
+            OperationId = "auth.resetpassword",
+            Tags = new[] { "PasswordEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPost("ResetPassword")]
+        public async Task<ActionResult<BaseResponse>> ResetPasswordAsync([FromBody] ResetPasswordRequest request)
+        {
+            var resetResponse = await _authService.ResetPasswordAsync(request);
+            return HandleResult(resetResponse);
+        }
+
+        //[SwaggerOperation(
+        //    Summary = "Logout a user",
+        //    Description = "This endpoint invalidates all refresh tokens and jwt tokens of a user",
+        //    OperationId = "auth.logout",
+        //    Tags = new[] { "AuthEndpoints" })
+        //]
+        //[Produces(MediaTypeNames.Application.Json)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        //[HttpPost("Logout")]
+        //public async Task<ActionResult<BaseResponse>> LogoutAsync()
+        //{
+        //    var logoutResponse = await _authService.LogoutAsync(User.Identity?.Name ?? string.Empty);
+        //    return Ok(logoutResponse);
+        //}
+
+
+        //[Authorize]
+        //[SwaggerOperation(
+        //    Summary = "Change user Password",
+        //    Description = "This endpoint change user password with new one",
+        //    OperationId = "auth.chnagepassword",
+        //    Tags = new[] { "PasswordEndpoints" })
+        //]
+        //[Produces(MediaTypeNames.Application.Json)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        //[HttpPost("ChangePassword")]
+        //public async Task<ActionResult<BaseResponse>> ChangePasswordAsync([FromBody] ChangePasswordRequest request)
+        //{
+        //    var resetResponse = await _authService.ChangePasswordAsync(request, User.Identity?.Name ?? string.Empty);
+        //    return Ok(resetResponse);
+        //}
+
+    }
+}
+
