@@ -53,6 +53,13 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/API-Host/swagger.json", "API-Host");
+    c.SwaggerEndpoint("/swagger/Access/swagger.json", "Access");
+});
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
