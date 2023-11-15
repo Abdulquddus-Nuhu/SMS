@@ -1,6 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
-using Module.Access;
-using Module.Access.Extensions;
+//using Module.Access;
+//using Module.Access.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 //Register Modules
-builder.AddAccessModule(builder.Services);
+//builder.AddAccessModule(builder.Services);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
