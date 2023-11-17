@@ -17,7 +17,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
@@ -32,7 +32,7 @@ jobs:
     - name: Copy to Server via SCP
       uses: garygrossgarten/github-action-scp@release
       with:
-        local: /home/runner/work/MyStar/MyStar/src/Host/API/bin/Release/net7.0/publish/
+        local: /home/runner/work/MyStar/MyStar/src/Host/API/bin/Release/net8.0/publish/
         concurrency: 10
         remote: ${{ secrets.REMOTE_TARGET }}
         host: ${{ secrets.REMOTE_HOST }}
@@ -42,7 +42,7 @@ jobs:
         ASPNETCORE_ENVIRONMENT: Staging
 
     #start service
-    - name: Start MyStarStaging Service
+    - name: Start MyStarAppStaging Service
       uses: garygrossgarten/github-action-ssh@v0.6.3
       with:
         command: service MyStarStaging restart
