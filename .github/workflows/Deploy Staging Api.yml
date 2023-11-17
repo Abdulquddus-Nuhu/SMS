@@ -40,12 +40,19 @@ jobs:
         password: ${{ secrets.REMOTE_PASSWORD }}
       env:
         ASPNETCORE_ENVIRONMENT: Staging
+        IT_HEAD_EMAIL: ${{ secrets.IT_HEAD_EMAIL }}
+        IT_HEAD_PASSWORD: ${{ secrets.IT_HEAD_PASSWORD }}
+        IT_HEAD_PHONENUMBER: ${{ secrets.IT_HEAD_PHONENUMBER }}
+        ROOT_ADMIN_EMAIL: ${{ secrets.ROOT_ADMIN_EMAIL }}
+        ROOT_ADMIN_PHONENUMBER: ${{ secrets.ROOT_ADMIN_PHONENUMBER }}
+        ROOT_DEFAULT_PASSWORD: ${{ secrets.ROOT_DEFAULT_PASSWORD }}
+        JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
     #start service
     - name: Start MyStarAppStaging Service
       uses: garygrossgarten/github-action-ssh@v0.6.3
       with:
-        command: service MyStarStaging restart
+        command: service MyStarAppStaging restart
         host: ${{ secrets.REMOTE_HOST }}
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_PASSWORD }}
