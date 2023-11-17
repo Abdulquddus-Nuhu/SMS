@@ -1,63 +1,237 @@
-﻿using Microsoft.OpenApi.Models;
-using Module.Access;
-using Module.Access.Extensions;
+﻿using Access.API.Extensions;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 
-var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
+Log.Information($"Starting up MyStar Web Server!");
 
-builder.Services.AddControllers();
-
-//Register Modules
-builder.AddAccessModule(builder.Services);
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(d =>
+try
 {
-    d.SwaggerDoc("API-Host", new OpenApiInfo()
+    var builder = WebApplication.CreateBuilder(args);
+
+    if (builder.Environment.IsProduction())
     {
-        Version = "v1",
-        Title = "MyStarApp API",
-        Description = "REST API for MyStar App @ Stella Maris Schools",
-        Contact = new OpenApiContact
+        builder.WebHost.UseUrls("http://localhost:4001");
+    }
+
+    builder.Logging.ClearProviders();
+
+    if (builder.Environment.IsDevelopment())
+    {
+        Log.Logger = new LoggerConfiguration()
+           .MinimumLevel.Debug()
+           .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+           .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information)
+           .Enrich.FromLogContext()
+           .WriteTo.Console()
+           .CreateLogger();
+    }
+    else if (builder.Environment.IsStaging())
+    {
+        Log.Logger = new LoggerConfiguration()
+           .MinimumLevel.Information()
+           .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+           .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+           .Enrich.FromLogContext()
+           .WriteTo.Console()
+           .WriteTo.File(
+                @"/logs/MyStarAppStaging/logs.txt",
+                fileSizeLimitBytes: 10485760,
+                rollOnFileSizeLimit: true,
+                shared: true,
+                retainedFileCountLimit: null,
+                flushToDiskInterval: TimeSpan.FromSeconds(1))
+           //.WriteTo.ApplicationInsights(TelemetryConfiguration.CreateDefault(), TelemetryConverter.Traces)
+           .CreateLogger();
+    }
+    else
+    {
+        Log.Logger = new LoggerConfiguration()
+           .MinimumLevel.Information()
+           .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+           .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+           .Enrich.FromLogContext()
+           .WriteTo.Console()
+           .WriteTo.File(
+                @"/logs/MyStarAppProduction/logs.txt",
+                fileSizeLimitBytes: 10485760,
+                rollOnFileSizeLimit: true,
+                shared: true,
+                retainedFileCountLimit: null,
+                flushToDiskInterval: TimeSpan.FromSeconds(1))
+           //.WriteTo.ApplicationInsights(TelemetryConfiguration.CreateDefault(), TelemetryConverter.Traces)
+           .CreateLogger();
+    }
+
+    builder.Host.UseSerilog();
+    builder.Services.AddControllers();
+
+    //Register Modules
+    builder.AddAccessModule(builder.Services, builder.Environment);
+
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(d =>
+    {
+        d.SwaggerDoc("API-Host", new OpenApiInfo()
         {
-            Name = "Stella Maris Schools",
-            Email = "dev.nuhu@smsbuja.com",
-        },
+            Version = "v1",
+            Title = "MyStarApp API",
+            Description = "REST API for MyStar App @ Stella Maris Schools",
+            Contact = new OpenApiContact
+            {
+                Name = "Stella Maris Schools",
+                Email = "dev.nuhu@smsbuja.com",
+            },
+        });
+
+        d.SwaggerDoc("Access", new OpenApiInfo
+        {
+            Title = "Access Module",
+            Version = "v1",
+            Description = "Access Module",
+            Contact = new OpenApiContact
+            {
+                Name = "Stella Maris Schools",
+                Email = "dev.nuhu@smsbuja.com",
+            },
+        });
+    });
+    
+    //Swagger Authentication/Authorization
+    builder.Services.AddSwaggerGen(c =>
+    {
+        var securityScheme = new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "JWT Authorization header using the Bearer scheme. **Enter Bearer Token Only**",
+            Reference = new OpenApiReference
+            {
+                Id = "Bearer",
+                Type = ReferenceType.SecurityScheme
+            }
+        };
+
+        //c.SwaggerDoc("v1", new OpenApiInfo()
+        //{
+        //    Version = "v1",
+        //    Title = "MyStarTracker API",
+        //    Description = "REST API for MyStar Tracker @ Stella Maris Schools",
+        //    Contact = new OpenApiContact
+        //    {
+        //        Name = "Stella Maris Schools",
+        //        Email = "dev.nuhu@smsbuja.com",
+        //        //Url = new Uri("https://sms.ng")
+        //    },
+        //});
+        c.EnableAnnotations();
+        c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
+        c.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            { securityScheme, Array.Empty<string>() }
+        });
     });
 
-    d.SwaggerDoc("Access", new OpenApiInfo
+    //Add Cors
+    const string CORS_POLICY = "CorsPolicy";
+    builder.Services.AddCors(options =>
     {
-        Title = "Access Module",
-        Version = "v1",
-        Description = "Access Module",
-        Contact = new OpenApiContact
-        {
-            Name = "itsfinniii"
-        }
+        options.AddPolicy(CORS_POLICY,
+                          builder =>
+                          {
+                              builder.WithOrigins();
+                              //builder.WithOrigins(new string[]
+                              //{
+                              //    "http://localhost:3000",
+                              //    "https://localhost:3000",
+                              //});
+                              builder.AllowAnyMethod();
+                              builder.AllowAnyHeader();
+                          });
     });
-});
+
+    // Security and Production enhancements 
+    if (!builder.Environment.IsDevelopment())
+    {
+        // Proxy Server Config
+        builder.Services.Configure<ForwardedHeadersOptions>(
+              options =>
+              {
+                  options.ForwardedHeaders =
+                      ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+              });
+
+        //Persist key
+        builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("/var/keys"));
+    }
+
+    //Remove Server Header
+    builder.WebHost.UseKestrel(options => options.AddServerHeader = false);
+
+    var path = Path.Combine(builder.Environment.ContentRootPath, "static");
+    // Create the directory if it doesn't exist
+    if (!Directory.Exists(path))
+    {
+        Directory.CreateDirectory(path);
+    }
 
 
-var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+    var app = builder.Build();
+
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    });
+
+    // Configure the HTTP request pipeline.
+   
+    //if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
+    //{
+    //    app.UseSwagger();
+    //    app.UseSwaggerUI(c =>
+    //    {
+    //        c.SwaggerEndpoint($"/swagger/API-Host/swagger.json", "API-Host");
+    //        c.SwaggerEndpoint($"/swagger/Access/swagger.json", "Access");
+    //    });
+    //}
+
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/API-Host/swagger.json", "API-Host");
-        c.SwaggerEndpoint("/swagger/Access/swagger.json", "Access");
+        c.SwaggerEndpoint($"/swagger/API-Host/swagger.json", "API-Host");
+        c.SwaggerEndpoint($"/swagger/Access/swagger.json", "Access");
     });
+
+    app.UseAuthentication();
+
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "static")),
+        RequestPath = "/static"
+    });
+
+    app.Run();
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "An unhandled exception occurred during bootstrapping the Server!");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
 
