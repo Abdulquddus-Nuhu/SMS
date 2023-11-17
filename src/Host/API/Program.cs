@@ -41,7 +41,7 @@ try
            .Enrich.FromLogContext()
            .WriteTo.Console()
            .WriteTo.File(
-                @"/logs/MystarStaging/logs.txt",
+                @"/logs/MyStarAppStaging/logs.txt",
                 fileSizeLimitBytes: 10485760,
                 rollOnFileSizeLimit: true,
                 shared: true,
@@ -59,7 +59,7 @@ try
            .Enrich.FromLogContext()
            .WriteTo.Console()
            .WriteTo.File(
-                @"/logs/MystarProduction/logs.txt",
+                @"/logs/MyStarAppProduction/logs.txt",
                 fileSizeLimitBytes: 10485760,
                 rollOnFileSizeLimit: true,
                 shared: true,
@@ -194,15 +194,23 @@ try
     });
 
     // Configure the HTTP request pipeline.
-    if (!app.Environment.IsProduction())
+   
+    //if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
+    //{
+    //    app.UseSwagger();
+    //    app.UseSwaggerUI(c =>
+    //    {
+    //        c.SwaggerEndpoint($"/swagger/API-Host/swagger.json", "API-Host");
+    //        c.SwaggerEndpoint($"/swagger/Access/swagger.json", "Access");
+    //    });
+    //}
+
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
     {
-        app.UseSwagger();
-        app.UseSwaggerUI(c =>
-        {
-            c.SwaggerEndpoint($"/swagger/API-Host/swagger.json", "API-Host");
-            c.SwaggerEndpoint($"/swagger/Access/swagger.json", "Access");
-        });
-    }
+        c.SwaggerEndpoint($"/swagger/API-Host/swagger.json", "API-Host");
+        c.SwaggerEndpoint($"/swagger/Access/swagger.json", "Access");
+    });
 
     app.UseAuthentication();
 
