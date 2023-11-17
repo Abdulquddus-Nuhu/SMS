@@ -19,6 +19,10 @@ try
     {
         builder.WebHost.UseUrls("http://localhost:4001");
     }
+    else
+    {
+        builder.WebHost.UseUrls("http://localhost:4002");
+    }
 
     builder.Logging.ClearProviders();
 
