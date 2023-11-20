@@ -19,7 +19,7 @@ try
     {
         builder.WebHost.UseUrls("http://localhost:4001");
     }
-    else
+    else if (builder.Environment.IsStaging())
     {
         builder.WebHost.UseUrls("http://localhost:4002");
     }
