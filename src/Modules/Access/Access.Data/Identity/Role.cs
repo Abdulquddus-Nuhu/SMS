@@ -10,6 +10,8 @@ namespace Access.Data.Identity
 {
     public class Role : IdentityRole<Guid>
     {
+        public bool IsDeleted { get; set; }
+
         public Role()
         {
         }

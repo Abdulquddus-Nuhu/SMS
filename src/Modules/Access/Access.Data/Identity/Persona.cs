@@ -8,16 +8,11 @@ using System.Threading.Tasks;
 
 namespace Access.Data.Identity
 {
-    public class Persona : IdentityUser<Guid>
+    public class Persona : BaseIdentity
     {
         public string LastName { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
         public string FullName { get => $"{FirstName} {LastName}"; }
-        public bool IsDeleted { get; set; }
-        public string CreatedBy { get; set; } = string.Empty;
-        public virtual DateTime Created { get; protected set; }
-        public virtual DateTime? Modified { get; protected set; }
-        public virtual string? LastModifiedBy { get; protected set; }
         public string? PhotoUrl { get; set; }
         public PersonaType PesonaType { get; set; }
 
