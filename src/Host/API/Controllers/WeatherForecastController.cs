@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
 [ApiController]
 [ApiExplorerSettings(GroupName = "API-Host")]
 [Route("[controller]")]
+[AllowAnonymous]
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
