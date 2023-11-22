@@ -28,14 +28,7 @@ namespace Access.API.Extensions
 
             //Register services
             string connectionString = string.Empty;
-            if (environment.IsProduction())
-            {
-                connectionString = Environment.GetEnvironmentVariable("AccessModule_DB_CONNECTION") ?? string.Empty;
-            }
-            else
-            {
-                connectionString = Environment.GetEnvironmentVariable("AccessModule_DB_CONNECTION") ?? string.Empty;
-            }
+            connectionString = Environment.GetEnvironmentVariable("AccessModule_DB_CONNECTION") ?? string.Empty;
 
             builder.Services.AddDbContext<AccessDbContext>(options =>
             {

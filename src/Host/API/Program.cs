@@ -34,6 +34,7 @@ try
            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information)
            .Enrich.FromLogContext()
            .WriteTo.Console()
+           //.WriteTo.File(outputTemplate:"", formatter: "Serilog.Formatting.Json.JsonFormatter, Serilog")
            .CreateLogger();
     }
     else if (builder.Environment.IsStaging())
