@@ -6,7 +6,6 @@ namespace API.Controllers;
 [ApiController]
 [ApiExplorerSettings(GroupName = "API-Host")]
 [Route("[controller]")]
-[AllowAnonymous]
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
@@ -21,6 +20,7 @@ public class WeatherForecastController : ControllerBase
         _logger = logger;
     }
 
+    [AllowAnonymous]
     [HttpGet(Name = "GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()
     {
