@@ -10,6 +10,10 @@ namespace Access.Data.Identity
 {
     public class Role : IdentityRole<Guid>
     {
+        public bool IsDeleted { get; set; }
+        public string? DeletedBy { get; protected set; } = string.Empty;
+        public virtual DateTime? Deleted { get; protected set; }
+
         public Role()
         {
         }
