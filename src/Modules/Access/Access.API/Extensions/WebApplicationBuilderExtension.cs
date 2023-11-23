@@ -30,15 +30,15 @@ namespace Access.API.Extensions
             string connectionString = string.Empty;
             connectionString = Environment.GetEnvironmentVariable("AccessModule_DB_CONNECTION") ?? string.Empty;
 
-            builder.Services.AddDbContext<AccessDbContext>(options =>
-            {
-                options.UseInMemoryDatabase("AccessDb");
-            });
-
             //builder.Services.AddDbContext<AccessDbContext>(options =>
             //{
-            //    options.UseNpgsql(connectionString);
+            //    options.UseInMemoryDatabase("AccessDb");
             //});
+
+            builder.Services.AddDbContext<AccessDbContext>(options =>
+            {
+                options.UseNpgsql(connectionString);
+            });
 
             builder.Services.AddIdentity<Persona, Role>(
                      options =>
