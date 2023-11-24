@@ -38,6 +38,7 @@ namespace Access.Data.Migrations
                     FirstName = table.Column<string>(type: "text", nullable: false),
                     PhotoUrl = table.Column<string>(type: "text", nullable: true),
                     PesonaType = table.Column<int>(type: "integer", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     JobTitle = table.Column<string>(type: "text", nullable: true),
                     Department = table.Column<string>(type: "text", nullable: true),
                     ParentId = table.Column<Guid>(type: "uuid", nullable: true),

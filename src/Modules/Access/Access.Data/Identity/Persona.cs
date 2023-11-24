@@ -15,6 +15,7 @@ namespace Access.Data.Identity
         public string FullName { get => $"{FirstName} {LastName}"; }
         public string? PhotoUrl { get; set; }
         public PersonaType PesonaType { get; set; }
+        public bool IsActive { get; set; } = true;
 
         //Staff
         public string? JobTitle { get; set; } = string.Empty;
@@ -35,6 +36,13 @@ namespace Access.Data.Identity
             Id = Guid.NewGuid();
         }
         public Persona() : this(DateTime.UtcNow, false) { }
+
+        public void Delete(string deletor)
+        {
+            IsDeleted = true;
+            Deleted = DateTime.UtcNow;
+            DeletedBy = deletor;
+        }
     }
 
 }

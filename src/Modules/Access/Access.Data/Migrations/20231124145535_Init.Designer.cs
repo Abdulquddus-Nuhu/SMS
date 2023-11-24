@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Access.Data.Migrations
 {
     [DbContext(typeof(AccessDbContext))]
-    [Migration("20231123155702_Init")]
+    [Migration("20231124145535_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -72,6 +72,9 @@ namespace Access.Data.Migrations
 
                     b.Property<string>("Grade")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
