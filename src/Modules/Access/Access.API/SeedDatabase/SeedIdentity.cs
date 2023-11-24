@@ -39,8 +39,8 @@ namespace Access.API.SeedDatabase
                 var superAdmin = new Persona()
                 {
                     Email = itHeadEmail,
-                    FirstName = "Mr Emma",
-                    LastName = "SuperAdminItHead",
+                    FirstName = "SuperAdmin",
+                    LastName = "IT-Head-Emma",
                     PhoneNumber = Environment.GetEnvironmentVariable("IT_HEAD_PHONENUMBER") ?? DefaultValues.IT_HEAD_PHONENUMBER,
                     UserName = itHeadEmail,
                     EmailConfirmed = true,

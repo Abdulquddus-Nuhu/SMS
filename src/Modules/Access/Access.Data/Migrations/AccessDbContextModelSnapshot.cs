@@ -70,6 +70,9 @@ namespace Access.Data.Migrations
                     b.Property<string>("Grade")
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
