@@ -28,24 +28,17 @@ namespace Access.API.Extensions
 
             //Register services
             string connectionString = string.Empty;
-            if (environment.IsProduction())
-            {
-                connectionString = Environment.GetEnvironmentVariable("AccessModule_DB_CONNECTION") ?? string.Empty;
-            }
-            else
-            {
-                connectionString = Environment.GetEnvironmentVariable("AccessModule_DB_CONNECTION") ?? string.Empty;
-            }
-
-            builder.Services.AddDbContext<AccessDbContext>(options =>
-            {
-                options.UseInMemoryDatabase("AccessDb");
-            });
+            connectionString = Environment.GetEnvironmentVariable("AccessModule_DB_CONNECTION") ?? string.Empty;
 
             //builder.Services.AddDbContext<AccessDbContext>(options =>
             //{
-            //    options.UseNpgsql(connectionString);
+            //    options.UseInMemoryDatabase("AccessDb");
             //});
+
+            builder.Services.AddDbContext<AccessDbContext>(options =>
+            {
+                options.UseNpgsql(connectionString);
+            });
 
             builder.Services.AddIdentity<Persona, Role>(
                      options =>

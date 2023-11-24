@@ -20,25 +20,25 @@ namespace Access.API.SeedDatabase
             var logger = scope.ServiceProvider.GetRequiredService<ILogger<SeedDb>>();
             try
             {
-                logger.LogInformation("Applying Migration!");
+                logger.LogInformation("Applying AccessModule_Db Migration!");
                 await context.Database.MigrateAsync(cancellationToken: cancellationToken);
-                logger.LogInformation("Migration Successful!");
+                logger.LogInformation("AccessModule_Db Migration Successful!");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Unable to apply Migration!");
+                logger.LogError(ex, "Unable to apply AccessModule_Db Migration!");
             }
             var userManager = scope.ServiceProvider.GetService<UserManager<Persona>>();
             var roleManager = scope.ServiceProvider.GetService<RoleManager<Role>>();
             try
             {
-                logger.LogInformation("Seeding Data!");
+                logger.LogInformation("Seeding AccessModule_Db Data!");
                 await SeedIdentity.SeedAsync(userManager, roleManager);
-                logger.LogInformation("Seeding Successful!");
+                logger.LogInformation("Seeding AccessModule_Db Successful!");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Unable to execute Data Seeding!");
+                logger.LogError(ex, "Unable to execute AccessModule_Db Data Seeding!");
             }
         }
 

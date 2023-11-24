@@ -6,7 +6,7 @@ namespace Shared.Constants
         #region DefaultPass
         public static class DefaultValues
         {
-            public const string ROOT_ADMIN_EMAIL = "dev.nuhu@smsbuja.com";
+            public const string ROOT_ADMIN_EMAIL = "dev.nuhu@smsabuja.com";
             public const string ROOT_DEFAULT_PASS = "DefaultPass#123";
             public const string ROOT_ADMIN_PHONENUMBER = "08038441300";
             public const string IT_HEAD_EMAIL = "it@smsabuja.com";
