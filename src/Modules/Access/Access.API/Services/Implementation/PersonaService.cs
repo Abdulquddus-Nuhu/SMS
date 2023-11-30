@@ -122,7 +122,6 @@ namespace Access.API.Services.Implementation
             }
 
 
-            //var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = string.Concat(host, photoUrl) };
             var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, PesonaType = PersonaType.Parent };
             var creationResult = await _userManager.CreateAsync(user, request.Password);
             if (!creationResult.Succeeded)
@@ -156,15 +155,6 @@ namespace Access.API.Services.Implementation
         public async Task<ApiResponse<StudentResponse>> CreateStudentAsync(CreateStudentRequest request, string host)
         {
             var response = new ApiResponse<StudentResponse>() { Code = ResponseCodes.Status201Created };
-
-            //var isSuccess = Guid.TryParse(request.ParentId, out Guid parentId);
-            //if (!isSuccess)
-            //{
-            //    response.Code = ResponseCodes.Status400BadRequest;
-            //    response.Status = false;
-            //    response.Message = "Invaild ParentId";
-            //    return response;
-            //}
 
             var parent = await _userManager.FindByIdAsync(request.ParentId.ToString());
             if (parent is null)
@@ -234,7 +224,7 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            var user = new Persona() { FirstName = request.FirstName, LastName = request.LastName, UserName = string.Concat(request.FirstName, request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, ParentId = request.ParentId, BusServiceRequired = request.BusServiceRequired, Grade = request.Grade };
+            var user = new Persona() { FirstName = request.FirstName, LastName = request.LastName,Email = string.Concat(request.FirstName, "@", request.LastName, ".com"), UserName = string.Concat(request.FirstName, request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, ParentId = request.ParentId, BusServiceRequired = request.BusServiceRequired, Grade = request.Grade, EmailConfirmed = true };
             var creationResult = await _userManager.CreateAsync(user);
             if (!creationResult.Succeeded)
             {
@@ -254,7 +244,7 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            response.Data = new StudentResponse() { PhotoUrl = user.PhotoUrl, FirstName = user.FirstName, BusServiceRequired = request.BusServiceRequired, Grade = request.Grade, LastName = user.LastName, Role = AuthConstants.Roles.STUDENT };
+            response.Data = new StudentResponse() {StudentId = user.Id, PhotoUrl = user.PhotoUrl, FirstName = user.FirstName, BusServiceRequired = request.BusServiceRequired, Grade = request.Grade, LastName = user.LastName, Role = AuthConstants.Roles.STUDENT };
 
             //if (roleResult.Succeeded)
             //{
@@ -519,7 +509,6 @@ namespace Access.API.Services.Implementation
             response.Data = await students.ToListAsync();
             return response;
         }
-        // using my staff response class get the list of staff
         public async Task<ApiResponse<List<StaffResponse>>> StaffListAsync()
         {
             var response = new ApiResponse<List<StaffResponse>>();
@@ -539,7 +528,6 @@ namespace Access.API.Services.Implementation
             response.Data = await staff.ToListAsync();
             return response;
         }
-        //add list of Bus Drivers
         public async Task<ApiResponse<List<BusDriverResponse>>> BusDriverListAsync()
         {
             var response = new ApiResponse<List<BusDriverResponse>>();
@@ -560,6 +548,118 @@ namespace Access.API.Services.Implementation
             response.Data = await busdrivers.ToListAsync();
             return response;
         }
+
+        public async Task<BaseResponse> DeleteParentAsync(Guid parentId, string deletor)
+        {
+            _logger.LogInformation("Trying to delete a user with id: {0}", parentId);
+            var response = new BaseResponse();
+
+            var parent = await _userManager.FindByIdAsync(parentId.ToString());
+            if (parent is null)
+            {
+                _logger.LogInformation("Parent with id: {0} not found", parentId);
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Message = "Parent not found";
+                response.Status = false;
+                return response;
+            }
+
+            parent.Delete(deletor);
+
+            if (!(await _userManager.UpdateAsync(parent)).Succeeded)
+            {
+                response.Code = ResponseCodes.Status500InternalServerError;
+                response.Status = false;
+                response.Message = "Unable to delete parent! Please try again";
+                return response;
+            }
+
+            return response;
+        }
+
+        public async Task<ApiResponse<ParentResponse>> GetParentAsync(Guid parentId)
+        {
+            _logger.LogInformation("Trying to get a parent with id: {0}", parentId);
+            var response = new ApiResponse<ParentResponse>() { Code = ResponseCodes.Status200OK };
+
+            var parent = await _userManager.FindByIdAsync(parentId.ToString());
+            if (parent is null)
+            {
+                _logger.LogInformation("Parent with id: {0} not found", parentId);
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Message = "Parent not found";
+                response.Status = false;
+                return response;
+            }
+
+            response.Data = new ParentResponse()
+            {
+                Email = parent.Email ?? string.Empty,
+                ParentId = parent.Id,
+                PhoneNumber = parent.PhoneNumber ?? string.Empty,
+                FirstName = parent.FirstName,
+                LastName = parent.LastName,
+                PhotoUrl = parent.PhotoUrl ?? string.Empty,
+            };
+
+            return response;
+        }
+
+
+        public async Task<BaseResponse> DeleteStudnetAsync(Guid studentId, string deletor)
+        {
+            _logger.LogInformation("Trying to delete a user with id: {0}", studentId);
+            var response = new BaseResponse();
+
+            var student = await _userManager.FindByIdAsync(studentId.ToString());
+            if (student is null)
+            {
+                _logger.LogInformation("Parent with id: {0} not found", studentId);
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Message = "Parent not found";
+                response.Status = false;
+                return response;
+            }
+
+            student.Delete(deletor);
+
+            if (!(await _userManager.UpdateAsync(student)).Succeeded)
+            {
+                response.Code = ResponseCodes.Status500InternalServerError;
+                response.Status = false;
+                response.Message = "Unable to delete student! Please try again";
+                return response;
+            }
+
+            return response;
+        }
+
+        public async Task<ApiResponse<StudentResponse>> GetStudentAsync(Guid studentId)
+        {
+            _logger.LogInformation("Trying to get a student with id: {0}", studentId);
+            var response = new ApiResponse<StudentResponse>() { Code = ResponseCodes.Status200OK };
+
+            var parent = await _userManager.FindByIdAsync(studentId.ToString());
+            if (parent is null)
+            {
+                _logger.LogInformation("Student with id: {0} not found", studentId);
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Message = "Student not found";
+                response.Status = false;
+                return response;
+            }
+
+            response.Data = new StudentResponse()
+            {
+                StudentId = parent.Id,
+                FirstName = parent.FirstName,
+                LastName = parent.LastName,
+                PhotoUrl = parent.PhotoUrl ?? string.Empty,
+            };
+
+            return response;
+        }
+
 
     }
 
