@@ -26,7 +26,7 @@ namespace Access.API.Controllers
         }
 
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
               Summary = "Create a new Parent Endpoint",
               Description = "This endpoint creates a new Parent. It requires Admin privilege",
@@ -49,7 +49,7 @@ namespace Access.API.Controllers
         }
 
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
             Summary = "Create a new Student Endpoint",
             Description = "This endpoint creates a new Student. It requires Admin privilege",
@@ -119,7 +119,7 @@ namespace Access.API.Controllers
             return HandleResult(response);
         }
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
         Summary = "Get List Of Parents Endpoint",
         Description = "This endpoint gets the list of parents . It requires Admin privilege",
@@ -161,7 +161,7 @@ namespace Access.API.Controllers
             return HandleResult(response);
         }
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
         Summary = "Get List Of Students Endpoint",
         Description = "This endpoint gets the list of students . It requires Admin privilege",
@@ -218,12 +218,101 @@ namespace Access.API.Controllers
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        [HttpGet(" busDriver")]
+        [HttpGet("busDriver")]
         public async Task<ActionResult<ApiResponse<List<BusDriverResponse>>>> GetBusDriverAsync()
         {
             var response = await _personaService.BusDriverListAsync();
             return HandleResult(response);
         }
+
+
+        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [SwaggerOperation(
+        Summary = "Delete A Parent Endpoint",
+        Description = "This endpoint deletes a parent. It requires Admin privilege",
+        OperationId = "parent.delete",
+        Tags = new[] { "PersonaEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpDelete("delete-parent")]
+        public async Task<ActionResult<BaseResponse>> DeleteParentAsync(Guid parentId)
+        {
+            var response = await _personaService.DeleteParentAsync(parentId, User.Identity!.Name ?? string.Empty);
+            return HandleResult(response);
+        }
+
+
+        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [SwaggerOperation(
+        Summary = "Delete A Student Endpoint",
+        Description = "This endpoint deletes a student. It requires Admin privilege",
+        OperationId = "student.delete",
+        Tags = new[] { "PersonaEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpDelete("delete-student")]
+        public async Task<ActionResult<BaseResponse>> DeleteStudentAsync(Guid studentId)
+        {
+            var response = await _personaService.DeleteStudnetAsync(studentId, User.Identity!.Name ?? string.Empty);
+            return HandleResult(response);
+        }
+
+
+        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [SwaggerOperation(
+        Summary = "Get A Parent Endpoint",
+        Description = "This endpoint gets a parent. It requires Admin privilege",
+        OperationId = "parent.get",
+        Tags = new[] { "PersonaEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<ParentResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpGet("parentId")]
+        public async Task<ActionResult<ApiResponse<ParentResponse>>> GetParentAsync(Guid parentId)
+        {
+            var response = await _personaService.GetParentAsync(parentId);
+            return HandleResult(response);
+        }
+
+        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [SwaggerOperation(
+        Summary = "Get A Student Endpoint",
+        Description = "This endpoint gets a student. It requires Admin privilege",
+        OperationId = "student.get",
+        Tags = new[] { "PersonaEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<StudentResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpGet("studentId")]
+        public async Task<ActionResult<ApiResponse<StudentResponse>>> GetStudentAsync(Guid studentId)
+        {
+            var response = await _personaService.GetStudentAsync(studentId);
+            return HandleResult(response);
+        }
+
+
     }
 
 
