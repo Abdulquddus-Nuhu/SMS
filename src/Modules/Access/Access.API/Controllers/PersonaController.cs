@@ -49,7 +49,7 @@ namespace Access.API.Controllers
         }
 
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
             Summary = "Create a new Student Endpoint",
             Description = "This endpoint creates a new Student. It requires Admin privilege",
@@ -140,7 +140,7 @@ namespace Access.API.Controllers
             return HandleResult(response);
         }
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
         Summary = "Get List Of Students For A Parent Endpoint",
         Description = "This endpoint gets the list of students for a Parent. It requires Admin privilege",
