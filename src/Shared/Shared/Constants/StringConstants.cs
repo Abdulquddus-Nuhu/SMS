@@ -12,7 +12,7 @@ namespace Shared.Constants
             public const string IT_HEAD_EMAIL = "it@smsabuja.com";
             public const string IT_HEAD_PASSWORD = "DefaultPass@1234";
             public const string IT_HEAD_PHONENUMBER = "08060216275";
-            public const string AccessModule_DB_CONNECTION = "Host=localhost;Database=MyStar_Access_Db;password=master;username=postgres;";
+            public const string AccessModule_DB_CONNECTION = "Host=localhost;Database=MyStar_Access_Db;password=molo;username=postgres;";
             public const string STERLOAN_DB_CONNECTION = "Host=localhost;Database=sterloan;";
             public const string STERLOAN_REDIS_CONNECTION = "localhost:6479";
             public const string JWT_SECRET_KEY = "SampleKey&392929SampleKey&392929SampleKey&392929";
