@@ -14,7 +14,7 @@ using System.Net.Mime;
 
 namespace Access.API.Controllers
 {
-    //[ApiExplorerSettings(GroupName = "Access")]
+    [ApiExplorerSettings(GroupName = "Access")]
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
