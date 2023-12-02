@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Access.Core.Entities;
+using Microsoft.AspNetCore.Identity;
 using Shared.Enums;
 using System;
 using System.Collections.Generic;
@@ -18,16 +19,25 @@ namespace Access.Data.Identity
         public bool IsActive { get; set; } = true;
 
         //Staff
-        public string? JobTitle { get; set; } = string.Empty;
-        public string? Department { get; set; } = string.Empty;
+        //public string? JobTitle { get; set; } = string.Empty;
+        public Guid? JobTitleId { get; set; }
+        public JobTitle? JobTitle { get; set; }
+        //public string? Department { get; set; } = string.Empty;
+        public Guid? DepartmentId { get; set; } 
+        public Department? Department { get; set; }
 
         //Student
         public Guid? ParentId { get; set; }
-        public string? Grade { get; set; } = string.Empty;
+        //public string? Grade { get; set; } = string.Empty;
+        public Guid? GradeId { get; set; }
+        public Grade? Grade { get; set; }
         public bool? BusServiceRequired { get; set; }
 
+
         //Bus driver
-        public string? BusNumber { get; set; } = string.Empty;
+        //public string? BusNumber { get; set; } = string.Empty;
+        public Guid? BusId { get; set; }
+        public Bus? Bus { get; set; }
 
         public Persona(DateTime created, bool isDeleted)
         {

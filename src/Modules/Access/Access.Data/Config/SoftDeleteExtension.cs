@@ -1,4 +1,4 @@
-﻿using Access.Data.Identity;
+﻿using Access.Core.Entities;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;

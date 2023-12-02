@@ -36,7 +36,7 @@ namespace Access.Models.Requests
         [Required]
         public IFormFile? Photo { get; set; }
 
-        public string BusNumber { get; set; } = string.Empty;
+        public Guid BusId { get; set; } 
     }
 
 }

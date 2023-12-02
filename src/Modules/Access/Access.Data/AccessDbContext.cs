@@ -1,4 +1,5 @@
-﻿using Access.Data.Config;
+﻿using Access.Core.Entities;
+using Access.Data.Config;
 using Access.Data.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,11 @@ namespace Access.Data
 
         //public DbSet<Student> Students { get; set; }
         //public DbSet<Parent> Parents { get; set; }
+        public DbSet<Campus> Campuses { get; set; }
+        public DbSet<Grade> Grades { get; set; }
+        public DbSet<JobTitle> JobTitles { get; set; }
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<Bus> Buses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -34,6 +40,20 @@ namespace Access.Data
                     entityType.AddSoftDeleteQueryFilter();
                 }
             });
+        }
+
+        public async Task<bool> TrySaveChangesAsync()
+        {
+            try
+            {
+                await SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
+            }
         }
 
     }

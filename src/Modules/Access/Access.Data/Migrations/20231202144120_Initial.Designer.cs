@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Access.Data.Migrations
 {
     [DbContext(typeof(AccessDbContext))]
-    [Migration("20231124145535_Init")]
-    partial class Init
+    [Migration("20231202144120_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,6 +25,215 @@ namespace Access.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Access.Core.Entities.Bus", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Modified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsDeleted");
+
+                    b.ToTable("Buses");
+                });
+
+            modelBuilder.Entity("Access.Core.Entities.Campus", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Modified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsDeleted");
+
+                    b.ToTable("Campuses");
+                });
+
+            modelBuilder.Entity("Access.Core.Entities.Department", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Modified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsDeleted");
+
+                    b.ToTable("Departments");
+                });
+
+            modelBuilder.Entity("Access.Core.Entities.Grade", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Arms")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("CampusId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Level")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Modified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampusId");
+
+                    b.HasIndex("IsDeleted");
+
+                    b.ToTable("Grades");
+                });
+
+            modelBuilder.Entity("Access.Core.Entities.JobTitle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("Modified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsDeleted");
+
+                    b.ToTable("JobTitles");
+                });
+
             modelBuilder.Entity("Access.Data.Identity.Persona", b =>
                 {
                     b.Property<Guid>("Id")
@@ -34,8 +243,8 @@ namespace Access.Data.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
-                    b.Property<string>("BusNumber")
-                        .HasColumnType("text");
+                    b.Property<Guid?>("BusId")
+                        .HasColumnType("uuid");
 
                     b.Property<bool?>("BusServiceRequired")
                         .HasColumnType("boolean");
@@ -56,8 +265,8 @@ namespace Access.Data.Migrations
                     b.Property<string>("DeletedBy")
                         .HasColumnType("text");
 
-                    b.Property<string>("Department")
-                        .HasColumnType("text");
+                    b.Property<Guid?>("DepartmentId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -70,8 +279,8 @@ namespace Access.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Grade")
-                        .HasColumnType("text");
+                    b.Property<Guid?>("GradeId")
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -79,8 +288,8 @@ namespace Access.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("JobTitle")
-                        .HasColumnType("text");
+                    b.Property<Guid?>("JobTitleId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
@@ -136,7 +345,15 @@ namespace Access.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BusId");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("GradeId");
+
                     b.HasIndex("IsDeleted");
+
+                    b.HasIndex("JobTitleId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -285,6 +502,44 @@ namespace Access.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Access.Core.Entities.Grade", b =>
+                {
+                    b.HasOne("Access.Core.Entities.Campus", "Campus")
+                        .WithMany()
+                        .HasForeignKey("CampusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campus");
+                });
+
+            modelBuilder.Entity("Access.Data.Identity.Persona", b =>
+                {
+                    b.HasOne("Access.Core.Entities.Bus", "Bus")
+                        .WithMany()
+                        .HasForeignKey("BusId");
+
+                    b.HasOne("Access.Core.Entities.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId");
+
+                    b.HasOne("Access.Core.Entities.Grade", "Grade")
+                        .WithMany()
+                        .HasForeignKey("GradeId");
+
+                    b.HasOne("Access.Core.Entities.JobTitle", "JobTitle")
+                        .WithMany()
+                        .HasForeignKey("JobTitleId");
+
+                    b.Navigation("Bus");
+
+                    b.Navigation("Department");
+
+                    b.Navigation("Grade");
+
+                    b.Navigation("JobTitle");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

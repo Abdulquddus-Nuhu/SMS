@@ -1,11 +1,15 @@
 ﻿using Access.API.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+using Shared.Constants;
 
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
@@ -182,12 +186,30 @@ try
     //Remove Server Header
     builder.WebHost.UseKestrel(options => options.AddServerHeader = false);
 
+
     var path = Path.Combine(builder.Environment.ContentRootPath, "static");
     // Create the directory if it doesn't exist
     if (!Directory.Exists(path))
     {
         Directory.CreateDirectory(path);
     }
+
+
+    //Ensure all controllers use jwt token
+    //builder.Services.AddControllers(options =>
+    //{
+    //    var policy = new AuthorizationPolicyBuilder()
+    //        .RequireAuthenticatedUser()
+    //        .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+    //        .Build();
+    //    options.Filters.Add(new AuthorizeFilter(policy));
+    //});
+
+    //authorization
+    builder.Services.AddAuthorization(options =>
+    {
+        options.AddPolicy(AuthConstants.Policies.CUSTODIANS, policy => policy.RequireRole(AuthConstants.Roles.ADMIN, AuthConstants.Roles.SUPER_ADMIN));
+    });
 
 
 
