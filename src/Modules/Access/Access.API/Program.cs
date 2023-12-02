@@ -23,7 +23,7 @@ connectionString = Environment.GetEnvironmentVariable("AccessModule_DB_CONNECTIO
 
 builder.Services.AddDbContext<AccessDbContext>(options =>
 {
-    options.UseNpgsql(connectionString);
+    options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Access.Data"));
 });
 
 builder.Services.AddIdentity<Persona, Role>(
@@ -50,6 +50,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
 
 app.UseAuthorization();
 

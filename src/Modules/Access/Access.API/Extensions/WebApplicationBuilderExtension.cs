@@ -16,6 +16,8 @@ using System;
 using System.Reflection;
 using static Shared.Constants.StringConstants;
 using System.Text;
+using Access.Core.Interfaces.Repositories;
+using Access.Data.Repositories;
 
 namespace Access.API.Extensions
 {
@@ -57,10 +59,18 @@ namespace Access.API.Extensions
             builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
             builder.Services.AddTransient<IEmailService, SmtpEmailSender>();
 
+
+            //Repositories
+            builder.Services.AddTransient<ICampusRepository, CampusRepository>();
+            builder.Services.AddTransient<IGradeRepository, GradeRepository>();
+
+
+            //Services
             builder.Services.Scan(scan => scan.FromAssemblyOf<IAuthService>()
              .AddClasses(classes => classes.InNamespaceOf<AuthService>())
              .AsImplementedInterfaces()
              .WithTransientLifetime());
+           
 
             //Shared Services
             builder.Services.Scan(scan => scan.FromAssemblyOf<IOtpGenerator>()
@@ -69,15 +79,6 @@ namespace Access.API.Extensions
              .WithTransientLifetime());
 
 
-            //Ensure all controllers use jwt token
-            builder.Services.AddControllers(options =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-                    .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
-            });
 
             var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ?? DefaultValues.JWT_SECRET_KEY);
             var tokenValidationParams = new TokenValidationParameters

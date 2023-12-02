@@ -37,10 +37,10 @@ namespace Access.Models.Requests
         public IFormFile? Photo { get; set; }
 
         [Required]
-        public string JobTitle { get; set; } = string.Empty;
+        public Guid JobTitleId { get; set; }
 
         [Required]
-        public string Department { get; set; } = string.Empty;
+        public Guid DepartmentId { get; set; }
     }
 
 }

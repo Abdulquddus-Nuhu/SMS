@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "src\Shared\Shared
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Access.API", "src\Modules\Access\Access.API\Access.API.csproj", "{302CCE05-535A-4739-9919-639DAD7BDC34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Access.Data", "src\Modules\Access\Access.Data\Access.Data.csproj", "{E578277D-B297-4ADC-A9C4-2663B21F22A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Access.Data", "src\Modules\Access\Access.Data\Access.Data.csproj", "{E578277D-B297-4ADC-A9C4-2663B21F22A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Access.Core", "src\Modules\Access\Access.Core\Access.Core.csproj", "{B00455F2-ECD2-4B81-8790-C6F352FADF50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{E578277D-B297-4ADC-A9C4-2663B21F22A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E578277D-B297-4ADC-A9C4-2663B21F22A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E578277D-B297-4ADC-A9C4-2663B21F22A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B00455F2-ECD2-4B81-8790-C6F352FADF50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B00455F2-ECD2-4B81-8790-C6F352FADF50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B00455F2-ECD2-4B81-8790-C6F352FADF50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B00455F2-ECD2-4B81-8790-C6F352FADF50}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -61,6 +67,7 @@ Global
 		{A9DACE36-9520-4640-8F7D-4A4BB98876E5} = {ABC51629-7C09-4DCA-B082-5FC68D54B232}
 		{302CCE05-535A-4739-9919-639DAD7BDC34} = {6D8E7DB3-D26F-4919-95D6-27E6E49AAFBB}
 		{E578277D-B297-4ADC-A9C4-2663B21F22A8} = {6D8E7DB3-D26F-4919-95D6-27E6E49AAFBB}
+		{B00455F2-ECD2-4B81-8790-C6F352FADF50} = {6D8E7DB3-D26F-4919-95D6-27E6E49AAFBB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {77C855B5-5917-4323-96E1-E0B265A3EDFF}

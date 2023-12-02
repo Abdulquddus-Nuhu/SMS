@@ -224,7 +224,7 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            var user = new Persona() { FirstName = request.FirstName, LastName = request.LastName,Email = string.Concat(request.FirstName, "@", request.LastName, ".com"), UserName = string.Concat(request.FirstName, request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, ParentId = request.ParentId, BusServiceRequired = request.BusServiceRequired, Grade = request.Grade, EmailConfirmed = true };
+            var user = new Persona() { FirstName = request.FirstName, LastName = request.LastName,Email = string.Concat(request.FirstName, "@", request.LastName, ".com"), UserName = string.Concat(request.FirstName, request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, ParentId = request.ParentId, BusServiceRequired = request.BusServiceRequired, GradeId = request.GradeId, EmailConfirmed = true };
             var creationResult = await _userManager.CreateAsync(user);
             if (!creationResult.Succeeded)
             {
@@ -244,7 +244,8 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            response.Data = new StudentResponse() {StudentId = user.Id, PhotoUrl = user.PhotoUrl, FirstName = user.FirstName, BusServiceRequired = request.BusServiceRequired, Grade = request.Grade, LastName = user.LastName, Role = AuthConstants.Roles.STUDENT };
+            //response.Data = new StudentResponse() {StudentId = user.Id, PhotoUrl = user.PhotoUrl, FirstName = user.FirstName, BusServiceRequired = request.BusServiceRequired, Grade = request.Grade, LastName = user.LastName, Role = AuthConstants.Roles.STUDENT };
+            response.Data = new StudentResponse() {StudentId = user.Id, PhotoUrl = user.PhotoUrl, FirstName = user.FirstName, BusServiceRequired = request.BusServiceRequired, LastName = user.LastName, Role = AuthConstants.Roles.STUDENT };
 
             //if (roleResult.Succeeded)
             //{
@@ -326,7 +327,7 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, BusNumber = request.BusNumber, PesonaType = PersonaType.BusDriver };
+            var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, BusId = request.BusId, PesonaType = PersonaType.BusDriver };
             var creationResult = await _userManager.CreateAsync(user, request.Password);
             if (!creationResult.Succeeded)
             {
@@ -422,7 +423,7 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, PesonaType = PersonaType.Staff, Department = request.Department, JobTitle = request.JobTitle };
+            var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, PesonaType = PersonaType.Staff, DepartmentId = request.DepartmentId, JobTitleId = request.JobTitleId };
             var creationResult = await _userManager.CreateAsync(user, request.Password);
             if (!creationResult.Succeeded)
             {
@@ -473,13 +474,14 @@ namespace Access.API.Services.Implementation
             var response = new ApiResponse<List<StudentResponse>>();
 
             var students = _dbContext.Users
+                .Include(x => x.Grade)
                 .Where(x => x.PesonaType == PersonaType.Student)
                 .Select(x => new StudentResponse()
                 {
                     StudentId = x.Id,
                     FirstName = x.FirstName,
                     LastName = x.LastName,
-                    Grade = x.Grade,
+                    Grade = x.Grade.Name,
                     BusServiceRequired = x.BusServiceRequired.Value,
                     PhotoUrl = x.PhotoUrl,
                 })
@@ -494,13 +496,14 @@ namespace Access.API.Services.Implementation
             var response = new ApiResponse<List<StudentResponse>>();
 
             var students = _dbContext.Users
+                .Include(x => x.Grade)
                 .Where(x => x.PesonaType == PersonaType.Student && x.ParentId == parentId)
                 .Select(x => new StudentResponse()
                 {
                     StudentId = x.Id,
                     FirstName = x.FirstName,
                     LastName = x.LastName,
-                    Grade = x.Grade,
+                    Grade = x.Grade!.Name,
                     BusServiceRequired = x.BusServiceRequired.Value,
                     PhotoUrl = x.PhotoUrl,
                 })
@@ -521,7 +524,6 @@ namespace Access.API.Services.Implementation
                     FirstName = x.FirstName,
                     LastName = x.LastName,
                     PhotoUrl = x.PhotoUrl,
-
                 })
                 .AsNoTracking();
 
@@ -533,6 +535,7 @@ namespace Access.API.Services.Implementation
             var response = new ApiResponse<List<BusDriverResponse>>();
 
             var busdrivers = _dbContext.Users
+                .Include(x => x.Bus)
                 .Where(x => x.PesonaType == PersonaType.BusDriver)
                 .Select(x => new BusDriverResponse()
                 {
@@ -540,7 +543,7 @@ namespace Access.API.Services.Implementation
                     FirstName = x.FirstName,
                     LastName = x.LastName,
                     PhotoUrl = x.PhotoUrl,
-                    BusNumber = x.BusNumber,
+                    BusNumber = x.Bus.Number,
 
                 })
                 .AsNoTracking();
@@ -639,8 +642,9 @@ namespace Access.API.Services.Implementation
             _logger.LogInformation("Trying to get a student with id: {0}", studentId);
             var response = new ApiResponse<StudentResponse>() { Code = ResponseCodes.Status200OK };
 
-            var parent = await _userManager.FindByIdAsync(studentId.ToString());
-            if (parent is null)
+            //var student = await _userManager.FindByIdAsync(studentId.ToString());
+            var student = await _dbContext.Users.Include(x => x.Grade).FirstOrDefaultAsync(x => x.Id == studentId);
+            if (student is null)
             {
                 _logger.LogInformation("Student with id: {0} not found", studentId);
                 response.Code = ResponseCodes.Status404NotFound;
@@ -651,10 +655,11 @@ namespace Access.API.Services.Implementation
 
             response.Data = new StudentResponse()
             {
-                StudentId = parent.Id,
-                FirstName = parent.FirstName,
-                LastName = parent.LastName,
-                PhotoUrl = parent.PhotoUrl ?? string.Empty,
+                StudentId = student.Id,
+                FirstName = student.FirstName,
+                LastName = student.LastName,
+                PhotoUrl = student.PhotoUrl ?? string.Empty,
+                Grade = student.Grade!.Name
             };
 
             return response;

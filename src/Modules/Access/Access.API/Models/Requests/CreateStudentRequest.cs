@@ -17,7 +17,7 @@ namespace Access.Models.Requests
         public string LastName { get; init; } = string.Empty;
 
         [Required]
-        public string Grade { get; init; } = string.Empty;
+        public Guid GradeId { get; init; }
 
         [Required]
         public bool BusServiceRequired { get; init; }
