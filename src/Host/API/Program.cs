@@ -81,6 +81,16 @@ try
     builder.Host.UseSerilog();
     builder.Services.AddControllers();
 
+    //Ensure all controllers use jwt token
+    builder.Services.AddControllers(options =>
+    {
+        var policy = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+            .Build();
+        options.Filters.Add(new AuthorizeFilter(policy));
+    });
+
     //Register Modules
     builder.AddAccessModule(builder.Services, builder.Environment);
 
@@ -187,56 +197,31 @@ try
     builder.WebHost.UseKestrel(options => options.AddServerHeader = false);
 
 
-    var path = Path.Combine(builder.Environment.ContentRootPath, "static");
     // Create the directory if it doesn't exist
+    var path = Path.Combine(builder.Environment.ContentRootPath, "static");
     if (!Directory.Exists(path))
     {
         Directory.CreateDirectory(path);
     }
 
 
-    //Ensure all controllers use jwt token
-    builder.Services.AddControllers(options =>
-    {
-        var policy = new AuthorizationPolicyBuilder()
-            .RequireAuthenticatedUser()
-            .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-            .Build();
-        options.Filters.Add(new AuthorizeFilter(policy));
-    });
-
-    //authorization
-    builder.Services.AddAuthorization(options =>
-    {
-        options.AddPolicy(AuthConstants.Policies.CUSTODIANS, policy => policy.RequireRole(AuthConstants.Roles.ADMIN, AuthConstants.Roles.SUPER_ADMIN));
-    });
-
-
-
     var app = builder.Build();
+
+    // Configure the HTTP request pipeline.
+
+    if (!app.Environment.IsProduction())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint($"/swagger/API-Host/swagger.json", "API-Host");
+            c.SwaggerEndpoint($"/swagger/Access/swagger.json", "Access");
+        });
+    }
 
     app.UseForwardedHeaders(new ForwardedHeadersOptions
     {
         ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-    });
-
-    // Configure the HTTP request pipeline.
-   
-    //if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
-    //{
-    //    app.UseSwagger();
-    //    app.UseSwaggerUI(c =>
-    //    {
-    //        c.SwaggerEndpoint($"/swagger/API-Host/swagger.json", "API-Host");
-    //        c.SwaggerEndpoint($"/swagger/Access/swagger.json", "Access");
-    //    });
-    //}
-
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint($"/swagger/API-Host/swagger.json", "API-Host");
-        c.SwaggerEndpoint($"/swagger/Access/swagger.json", "Access");
     });
 
     app.UseAuthentication();

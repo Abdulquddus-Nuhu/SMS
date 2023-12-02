@@ -29,14 +29,7 @@ namespace Access.API.Extensions
                             .AddApplicationPart(typeof(WebApplicationBuilderExtension).Assembly);
 
             //Register services
-            string connectionString = string.Empty;
-            connectionString = Environment.GetEnvironmentVariable("AccessModule_DB_CONNECTION") ?? string.Empty;
-
-            //builder.Services.AddDbContext<AccessDbContext>(options =>
-            //{
-            //    options.UseInMemoryDatabase("AccessDb");
-            //});
-
+            var connectionString = Environment.GetEnvironmentVariable("AccessModule_DB_CONNECTION") ?? string.Empty;
             builder.Services.AddDbContext<AccessDbContext>(options =>
             {
                 options.UseNpgsql(connectionString);
@@ -91,8 +84,6 @@ namespace Access.API.Extensions
                 RequireExpirationTime = true,
                 ClockSkew = TimeSpan.Zero
             };
-
-
 
             builder.Services.AddAuthentication(options =>
             {
