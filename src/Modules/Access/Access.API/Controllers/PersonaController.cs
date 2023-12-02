@@ -2,6 +2,7 @@
 using Access.Models.Requests;
 using Access.Models.Responses;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +14,10 @@ using System.Net.Mime;
 
 namespace Access.API.Controllers
 {
-    [ApiExplorerSettings(GroupName = "Access")]
+    //[ApiExplorerSettings(GroupName = "Access")]
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PersonaController : BaseController
     {
         private readonly IPersonaService _personaService;
@@ -26,7 +28,7 @@ namespace Access.API.Controllers
         }
 
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
               Summary = "Create a new Parent Endpoint",
               Description = "This endpoint creates a new Parent. It requires Admin privilege",
@@ -49,7 +51,7 @@ namespace Access.API.Controllers
         }
 
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
             Summary = "Create a new Student Endpoint",
             Description = "This endpoint creates a new Student. It requires Admin privilege",
@@ -140,7 +142,7 @@ namespace Access.API.Controllers
             return HandleResult(response);
         }
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
         Summary = "Get List Of Students For A Parent Endpoint",
         Description = "This endpoint gets the list of students for a Parent. It requires Admin privilege",
@@ -161,7 +163,7 @@ namespace Access.API.Controllers
             return HandleResult(response);
         }
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
         Summary = "Get List Of Students Endpoint",
         Description = "This endpoint gets the list of students . It requires Admin privilege",
@@ -226,7 +228,7 @@ namespace Access.API.Controllers
         }
 
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
         Summary = "Delete A Parent Endpoint",
         Description = "This endpoint deletes a parent. It requires Admin privilege",
@@ -248,7 +250,7 @@ namespace Access.API.Controllers
         }
 
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
         Summary = "Delete A Student Endpoint",
         Description = "This endpoint deletes a student. It requires Admin privilege",
@@ -270,7 +272,7 @@ namespace Access.API.Controllers
         }
 
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
         Summary = "Get A Parent Endpoint",
         Description = "This endpoint gets a parent. It requires Admin privilege",
@@ -291,7 +293,7 @@ namespace Access.API.Controllers
             return HandleResult(response);
         }
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
         Summary = "Get A Student Endpoint",
         Description = "This endpoint gets a student. It requires Admin privilege",

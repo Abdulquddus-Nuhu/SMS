@@ -1,6 +1,7 @@
 ﻿using Access.API.Services.Interfaces;
 using Access.Models.Requests;
 using Access.Models.Responses;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ namespace Access.API.Controllers
     [ApiExplorerSettings(GroupName = "Access")]
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AuthController : BaseController
     {
         private readonly IAuthService _authService;

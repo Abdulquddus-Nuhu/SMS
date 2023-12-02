@@ -4,8 +4,11 @@ using Access.API.Services.Implementation;
 using Access.API.Services.Interfaces;
 using Access.Models.Requests;
 using Access.Models.Responses;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Constants;
 using Shared.Controllers;
 using Shared.Models.Responses;
 using Swashbuckle.AspNetCore.Annotations;
@@ -17,6 +20,7 @@ namespace Access.API.Controllers
     //[Route("api/[controller]")]
     [Route("api/")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ConfigSPEController : BaseController
     {
         private readonly IGradeService _gradeService;
@@ -29,12 +33,12 @@ namespace Access.API.Controllers
         }
 
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
               Summary = "Create a new Campus Endpoint",
               Description = "This endpoint creates a new campus. It requires Admin privilege",
               OperationId = "campus.create",
-              Tags = new[] { "SPE-Configurations-Endpoints" })
+              Tags = new[] { "SPE-Configuration-Endpoints" })
         ]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
@@ -51,12 +55,12 @@ namespace Access.API.Controllers
         }
 
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
         Summary = "Get List Of Campus Endpoint",
         Description = "This endpoint gets the list of campus. It requires Admin privilege",
         OperationId = "campuses.get",
-        Tags = new[] { "SPE-Configurations-Endpoints" })
+        Tags = new[] { "SPE-Configuration-Endpoints" })
         ]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(ApiResponse<List<CampusResponse>>), StatusCodes.Status200OK)]
@@ -74,12 +78,12 @@ namespace Access.API.Controllers
 
 
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
               Summary = "Create a new Grade Endpoint",
               Description = "This endpoint creates a new grade. It requires Admin privilege",
               OperationId = "grade.create",
-              Tags = new[] { "SPE-Configurations-Endpoints" })
+              Tags = new[] { "SPE-Configuration-Endpoints" })
         ]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
@@ -96,12 +100,12 @@ namespace Access.API.Controllers
         }
 
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
         Summary = "Get List Of Grade Endpoint",
         Description = "This endpoint gets the list of grade. It requires Admin privilege",
         OperationId = "grades.get",
-        Tags = new[] { "SPE-Configurations-Endpoints" })
+        Tags = new[] { "SPE-Configuration-Endpoints" })
         ]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(ApiResponse<List<GradeResponse>>), StatusCodes.Status200OK)]
