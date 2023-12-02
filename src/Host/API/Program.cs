@@ -196,14 +196,14 @@ try
 
 
     //Ensure all controllers use jwt token
-    //builder.Services.AddControllers(options =>
-    //{
-    //    var policy = new AuthorizationPolicyBuilder()
-    //        .RequireAuthenticatedUser()
-    //        .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-    //        .Build();
-    //    options.Filters.Add(new AuthorizeFilter(policy));
-    //});
+    builder.Services.AddControllers(options =>
+    {
+        var policy = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+            .Build();
+        options.Filters.Add(new AuthorizeFilter(policy));
+    });
 
     //authorization
     builder.Services.AddAuthorization(options =>
