@@ -16,8 +16,8 @@ namespace Access.Models.Requests
         public string Email { get; set; } = string.Empty;
 
         [Required]
-        //[StringLength(50)]
-        [StringLength(11)]
+        [StringLength(50)]
+        //[StringLength(11)]
         public string PhoneNumber { get; init; } = string.Empty;
 
         [Required]
