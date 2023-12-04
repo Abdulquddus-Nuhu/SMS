@@ -111,7 +111,7 @@ namespace Access.API.Services.Implementation
                 return string.Empty;
             }
 
-            _logger.LogInformation("Creating a new user");
+            _logger.LogInformation("Creating a new Parent");
             var photoUrl = UploadParentPhoto(request.Photo);
             if (string.IsNullOrWhiteSpace(photoUrl))
             {
