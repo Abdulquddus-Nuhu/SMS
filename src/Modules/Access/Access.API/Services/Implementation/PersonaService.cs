@@ -468,12 +468,9 @@ namespace Access.API.Services.Implementation
 
             foreach (var parent in parents)
             {
-                parent.NumberOfStudent = _dbContext.Users.Where(x => x.ParentId == parent.ParentId).Count();
+                parent.NumberOfStudent = _dbContext.Users.Where(x => x.ParentId == parent.ParentId && x.IsDeleted == false).Count();
 
             }
-
-            var numberOfStudent = _dbContext.Users.Where(x => x.ParentId == x.ParentId).Count();
-
 
             response.Data = parents;
             return response;
