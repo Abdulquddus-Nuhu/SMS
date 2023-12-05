@@ -452,7 +452,7 @@ namespace Access.API.Services.Implementation
         {
             var response = new ApiResponse<List<ParentResponse>>();
 
-            var parents = _dbContext.Users
+            var parents = await _dbContext.Users
                 .Where(x => x.PesonaType == PersonaType.Parent)
                 .Select(x => new ParentResponse()
                 {
@@ -463,9 +463,19 @@ namespace Access.API.Services.Implementation
                     PhoneNumber = x.PhoneNumber,
                     PhotoUrl = x.PhotoUrl,
                 })
-                .AsNoTracking();
+                .AsNoTracking()
+                .ToListAsync();
 
-            response.Data = await parents.ToListAsync();
+            foreach (var parent in parents)
+            {
+                parent.NumberOfStudent = _dbContext.Users.Where(x => x.ParentId == parent.ParentId).Count();
+
+            }
+
+            var numberOfStudent = _dbContext.Users.Where(x => x.ParentId == x.ParentId).Count();
+
+
+            response.Data = parents;
             return response;
         }
 

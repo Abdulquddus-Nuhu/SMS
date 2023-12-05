@@ -16,6 +16,7 @@ namespace Access.Models.Responses
         public string PhotoUrl { get; set; } = string.Empty;
         public string UserName { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
+        public int NumberOfStudent { get; set; }
     }
 
 }
