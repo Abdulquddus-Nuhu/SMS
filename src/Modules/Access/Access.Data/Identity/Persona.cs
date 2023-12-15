@@ -53,6 +53,12 @@ namespace Access.Data.Identity
             Deleted = DateTime.UtcNow;
             DeletedBy = deletor;
         }
+
+        public void Edit(string editor)
+        {
+            Modified = DateTime.UtcNow;
+            LastModifiedBy = editor;
+        }
     }
 
 }

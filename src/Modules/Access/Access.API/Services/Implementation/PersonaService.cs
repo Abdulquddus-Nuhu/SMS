@@ -12,6 +12,7 @@ using static Shared.Constants.StringConstants;
 using System;
 using Access.Data;
 using Microsoft.EntityFrameworkCore;
+using Access.API.Models.Requests;
 
 namespace Access.API.Services.Implementation
 {
@@ -253,6 +254,53 @@ namespace Access.API.Services.Implementation
             //}
             return response;
         }
+       
+        
+        
+        
+        // this is to edit student
+       
+        
+        
+        public async Task<ApiResponse<StudentResponse>> EditStudentAsync(Guid studentId, EditStudentRequest request, string editor)
+        {
+            var response = new ApiResponse<StudentResponse>();
+
+            // Find the student to edit
+            var student = await _userManager.FindByIdAsync(studentId.ToString());
+            if (student is null)
+            {
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Status = false;
+                response.Message = "Student not found";
+                return response;
+            }
+
+            // Update student properties based on the request
+            student.FirstName = request.FirstName ?? student.FirstName;
+            student.LastName = request.LastName ??  student.LastName;
+            student.GradeId = request.GradeId ?? student.GradeId;
+            student.BusServiceRequired = request.BusServiceRequired;
+            student.Edit(editor);
+
+            // Check if a new photo is provided and update PhotoUrl accordingly
+          
+
+            // Update the student in the database
+            var updateResult = await _userManager.UpdateAsync(student);
+            if (!updateResult.Succeeded)
+            {
+                response.Code = ResponseCodes.Status500InternalServerError;
+                response.Status = false;
+                response.Message = string.Join(',', updateResult.Errors.Select(a => a.Description));
+                return response;
+            }
+
+     
+            return response;
+        }
+
+
 
         public async Task<BaseResponse> CreateBusDriverAsync(CreateBusDriverRequest request, string host)
         {

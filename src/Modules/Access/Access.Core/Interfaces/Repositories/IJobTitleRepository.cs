@@ -8,11 +8,10 @@ using System.Threading.Tasks;
 
 namespace Access.Core.Interfaces.Repositories
 {
-    public interface IGradeRepository
+    public interface IJobTitleRepository
     {
-        public Task<BaseResponse> AddGrade(Grade grade);
-        public Task<IQueryable<Grade>> GetAllAsync();
+        public Task<BaseResponse> AddJobTitle(JobTitle JobTitle );
+        public Task<IQueryable<JobTitle>> GetAllAsync();
 
-        
     }
 }

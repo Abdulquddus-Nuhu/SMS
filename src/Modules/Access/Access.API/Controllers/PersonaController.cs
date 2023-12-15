@@ -205,6 +205,13 @@ namespace Access.API.Controllers
             return HandleResult(response);
         }
 
+        //for edit student edpoint 
+
+
+
+
+
+
 
         [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
@@ -270,6 +277,35 @@ namespace Access.API.Controllers
             var response = await _personaService.DeleteStudnetAsync(studentId, User.Identity!.Name ?? string.Empty);
             return HandleResult(response);
         }
+
+        //edit student 
+
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)] // Adjust the authorization policy as needed
+        [SwaggerOperation(
+    Summary = "Edit Student Endpoint",
+    Description = "This endpoint edits a student. It requires Admin privilege",
+    OperationId = "student.edit",
+    Tags = new[] { "PersonaEndpoints" })
+]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<StudentResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPut("edit-student")]
+        public async Task<ActionResult<ApiResponse<StudentResponse>>> EditStudentAsync(Guid studentId, [FromBody] EditStudentRequest request)
+        {
+            var response = await _personaService.EditStudentAsync(studentId, request, User.Identity!.Name ?? string.Empty);
+            return HandleResult(response);
+        }
+
+
+
+
+
+
+
 
 
         [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]

@@ -25,11 +25,13 @@ namespace Access.API.Controllers
     {
         private readonly IGradeService _gradeService;
         private readonly ICampusService _campusService;
+        private readonly IJobTitleService _jobTitleService;
 
-        public ConfigSPEController(IGradeService gradeService, ICampusService campusService)
+        public ConfigSPEController(IGradeService gradeService, ICampusService campusService , IJobTitleService jobTitleService)
         {
             _gradeService = gradeService;
             _campusService = campusService;
+            _jobTitleService = jobTitleService;
         }
 
 
@@ -120,5 +122,56 @@ namespace Access.API.Controllers
             var response = await _gradeService.GetAllAsync();
             return HandleResult(response);
         }
+
+
+
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [SwaggerOperation(
+        Summary = "Create JobTitle Endpoint",
+        Description = "This endpoint create a  JobTitle. It requires Admin privilege",
+        OperationId = "jobTitle.post",
+        Tags = new[] { "SPE-Configuration-Endpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<List<JobTitleRespone>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPost("Create-JobTitle")]
+        public async Task<ActionResult<BaseResponse>> CreateJobTitleAsync(CreateJobTitleRequest request )
+        {
+            var response = await _jobTitleService.CreateJobTitle( request);
+            return HandleResult(response);
+        }
+
+
+
+
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [SwaggerOperation(
+        Summary = "Get List Of JobTitle Endpoint",
+        Description = "This endpoint gets the list of JobTitle. It requires Admin privilege",
+        OperationId = "jobTitle.get",
+        Tags = new[] { "SPE-Configuration-Endpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<List<JobTitleRespone>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpGet("jobTitle-list")]
+        public async Task<ActionResult<ApiResponse<List<JobTitleRespone>>>> GetJobTitleAsync()
+        {
+            var response = await _jobTitleService.GetAllAsync();
+            return HandleResult(response);
+        }
+
+
+
+
     }
 }
