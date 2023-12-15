@@ -20,5 +20,8 @@ namespace Access.API.Services.Interfaces
         public Task<ApiResponse<List<StaffResponse>>> StaffListAsync();
         public Task<ApiResponse<List<BusDriverResponse>>> BusDriverListAsync();
 
+        public Task<ApiResponse<StudentResponse>> EditStudentAsync(Guid studentId, EditStudentRequest request, string editor);
+
+
     }
 }

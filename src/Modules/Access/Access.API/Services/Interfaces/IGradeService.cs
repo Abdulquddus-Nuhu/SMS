@@ -7,6 +7,7 @@ namespace Access.API.Services.Interfaces
     public interface IGradeService
     {
         public Task<BaseResponse> CreateGrade(CreateGradeRequest request);
+       
         public Task<ApiResponse<List<GradeResponse>>> GetAllAsync();
     }
 }
