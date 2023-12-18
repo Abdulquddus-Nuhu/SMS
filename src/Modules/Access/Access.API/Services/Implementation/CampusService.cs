@@ -13,15 +13,17 @@ namespace Access.API.Services.Implementation
         private readonly ICampusRepository _campusRepository;
         public CampusService(ICampusRepository campusRepository)
         {
-                _campusRepository = campusRepository;
+            _campusRepository = campusRepository;
         }
 
-        public async Task<BaseResponse> CreateCampus(CreateCampusRequest request)
+        public async Task<BaseResponse> CreateCampus(CreateCampusRequest request, string creator)
         {
             var campus = new Campus()
             {
                 Name = request.Name,
                 Location = request.Location,
+                CreatedBy = creator,
+                Created = DateTime.UtcNow,
             };
 
             var result = await _campusRepository.AddCampus(campus);

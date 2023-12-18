@@ -315,7 +315,7 @@ namespace Access.API.Controllers
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        [HttpPut("edit-student")]
+        [HttpPut("edit-parent")]
         public async Task<ActionResult<BaseResponse>> EditParentAsync(Guid parentId, [FromBody] EditParentRequest request)
         {
             var response = await _personaService.EditParentAsync(parentId, request, User.Identity!.Name ?? string.Empty);

@@ -57,6 +57,7 @@ namespace Access.API.Extensions
             builder.Services.AddTransient<ICampusRepository, CampusRepository>();
             builder.Services.AddTransient<IGradeRepository, GradeRepository>();
             builder.Services.AddTransient<IJobTitleRepository, JobTitleRepository>();
+            builder.Services.AddTransient<IBusRepository, BusRepository>();
 
 
             //Services
