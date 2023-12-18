@@ -42,6 +42,32 @@ namespace Access.API.Services.Implementation
                 }).ToListAsync() 
             };
         }
+        
+        public async Task<ApiResponse<List<CampusResponse>>> GetCampusWithGradesAsync()
+        {
+            var campuses = await _campusRepository.GetCampusWithGradesAsync();
+
+            return new ApiResponse<List<CampusResponse>>()
+            {
+                Data = await campuses.Select(c => new CampusResponse()
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Location = c.Location,
+                    Grades = c.Grades
+                    .Select(g => new GradeResponse()
+                    {
+                        Id = g.Id,
+                        Name = g.Name,
+                        Arms = g.Arms,
+                        Level = g.Level,
+                        CampusName = c.Name
+                    })
+                    .ToList(),
+
+                }).ToListAsync() 
+            };
+        }
 
     }
 }

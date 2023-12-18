@@ -115,6 +115,8 @@ builder.Services.AddTransient<IEmailService, SmtpEmailSender>();
 //Repositories
 builder.Services.AddTransient<ICampusRepository, CampusRepository>();
 builder.Services.AddTransient<IGradeRepository, GradeRepository>();
+builder.Services.AddTransient<IJobTitleRepository, JobTitleRepository>();
+
 
 //Services
 builder.Services.Scan(scan => scan.FromAssemblyOf<IAuthService>()

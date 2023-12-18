@@ -8,5 +8,6 @@ namespace Access.API.Services.Interfaces
     {
         public Task<BaseResponse> CreateCampus(CreateCampusRequest request);
         public Task<ApiResponse<List<CampusResponse>>> GetAllAsync();
+        public Task<ApiResponse<List<CampusResponse>>> GetCampusWithGradesAsync();
     }
 }

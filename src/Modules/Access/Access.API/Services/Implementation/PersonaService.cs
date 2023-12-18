@@ -63,7 +63,7 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            string UploadParentPhoto(IFormFile photo)
+            string UploadParentPhoto(IFormFile? photo)
             {
                 string path = Path.Combine(_webHost.ContentRootPath, "static", "parent-images");
                 if (!Directory.Exists(path))
@@ -166,7 +166,7 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            string UploadStudentPhoto(IFormFile photo)
+            string UploadStudentPhoto(IFormFile? photo)
             {
                 string path = Path.Combine(_webHost.ContentRootPath, "static", "student-images");
                 if (!Directory.Exists(path))
@@ -296,6 +296,7 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
+            var si = _httpContext.Connection.ToString();
      
             return response;
         }
@@ -314,7 +315,7 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            string UploadBusDriverPhoto(IFormFile photo)
+            string UploadBusDriverPhoto(IFormFile? photo)
             {
                 string path = Path.Combine(_webHost.ContentRootPath, "static", "busdriver-images");
                 if (!Directory.Exists(path))
@@ -322,7 +323,7 @@ namespace Access.API.Services.Implementation
                     Directory.CreateDirectory(path);
                 }
 
-                if (photo != null && photo.Length > 0)
+                if (photo is { Length: > 0 })
                 {
                     //Getting FileName
                     var fileName = Path.GetFileName(photo.FileName);
@@ -338,11 +339,9 @@ namespace Access.API.Services.Implementation
                     try
                     {
                         filepath = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "static", "busdriver-images")).Root + $"{newFileName}";
-                        using (FileStream fs = System.IO.File.Create(filepath))
-                        {
-                            request.Photo.CopyTo(fs);
-                            fs.Flush();
-                        }
+                        using FileStream fs = System.IO.File.Create(filepath);
+                        request.Photo?.CopyTo(fs);
+                        fs.Flush();
                     }
                     catch (Exception ex)
                     {
@@ -410,7 +409,7 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            string UploadStaffPhoto(IFormFile photo)
+            string UploadStaffPhoto(IFormFile? photo)
             {
                 string path = Path.Combine(_webHost.ContentRootPath, "static", "staff-images");
                 if (!Directory.Exists(path))
@@ -418,7 +417,7 @@ namespace Access.API.Services.Implementation
                     Directory.CreateDirectory(path);
                 }
 
-                if (photo != null && photo.Length > 0)
+                if (photo is { Length: > 0 })
                 {
                     //Getting FileName
                     var fileName = Path.GetFileName(photo.FileName);
@@ -434,11 +433,9 @@ namespace Access.API.Services.Implementation
                     try
                     {
                         filepath = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "static", "staff-images")).Root + $"{newFileName}";
-                        using (FileStream fs = System.IO.File.Create(filepath))
-                        {
-                            request.Photo.CopyTo(fs);
-                            fs.Flush();
-                        }
+                        using FileStream fs = File.Create(filepath);
+                        request.Photo?.CopyTo(fs);
+                        fs.Flush();
                     }
                     catch (Exception ex)
                     {

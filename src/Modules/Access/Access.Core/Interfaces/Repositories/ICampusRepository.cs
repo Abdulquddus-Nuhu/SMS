@@ -12,5 +12,6 @@ namespace Access.Core.Interfaces.Repositories
     {
         public Task<BaseResponse> AddCampus(Campus campus);
         public Task<IQueryable<Campus>> GetAllAsync();
+        public Task<IQueryable<Campus>> GetCampusWithGradesAsync();
     }
 }

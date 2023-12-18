@@ -21,19 +21,14 @@ namespace Access.API.Controllers
     [Route("api/")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class ConfigSPEController : BaseController
+    public class ConfigSPEController(IGradeService gradeService, ICampusService campusService,
+        IJobTitleService jobTitleService,
+        IBusService busService) : BaseController
     {
-        private readonly IGradeService _gradeService;
-        private readonly ICampusService _campusService;
-        private readonly IJobTitleService _jobTitleService;
-
-        public ConfigSPEController(IGradeService gradeService, ICampusService campusService , IJobTitleService jobTitleService)
-        {
-            _gradeService = gradeService;
-            _campusService = campusService;
-            _jobTitleService = jobTitleService;
-        }
-
+        private readonly IGradeService _gradeService = gradeService;
+        private readonly ICampusService _campusService = campusService;
+        private readonly IJobTitleService _jobTitleService = jobTitleService;
+        private readonly IBusService _busService = busService;
 
         [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
@@ -75,6 +70,28 @@ namespace Access.API.Controllers
         public async Task<ActionResult<ApiResponse<List<CampusResponse>>>> GetCampusListAsync()
         {
             var response = await _campusService.GetAllAsync();
+            return HandleResult(response);
+        }
+
+
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [SwaggerOperation(
+        Summary = "Get List Of Campus Including Grades Endpoint",
+        Description = "This endpoint gets the list of campus including the grades associated with the campus. It requires Admin privilege",
+        OperationId = "campusesGrades.get",
+        Tags = new[] { "SPE-Configuration-Endpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<List<CampusResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpGet("campus-grades-list")]
+        public async Task<ActionResult<ApiResponse<List<CampusResponse>>>> GetCampusWithGradesAsync()
+        {
+            var response = await _campusService.GetCampusWithGradesAsync();
             return HandleResult(response);
         }
 
