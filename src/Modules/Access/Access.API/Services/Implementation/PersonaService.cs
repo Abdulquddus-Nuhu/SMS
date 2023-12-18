@@ -152,6 +152,36 @@ namespace Access.API.Services.Implementation
             return response;
         }
 
+        public async Task<BaseResponse> EditParentAsync(Guid parentId, EditParentRequest request, string editor)
+        {
+            var response = new BaseResponse();
+
+            var parent = await _userManager.FindByIdAsync(parentId.ToString());
+            if (parent is null)
+            {
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Status = false;
+                response.Message = "Parent not found";
+                return response;
+            }
+
+            parent.FirstName = request.FirstName ?? parent.FirstName;
+            parent.LastName = request.LastName ?? parent.LastName;
+            parent.Edit(editor);
+
+            var updateResult = await _userManager.UpdateAsync(parent);
+            if (!updateResult.Succeeded)
+            {
+                response.Code = ResponseCodes.Status500InternalServerError;
+                response.Status = false;
+                response.Message = string.Join(',', updateResult.Errors.Select(a => a.Description));
+                return response;
+            }
+
+            return response;
+        }
+
+
 
         public async Task<ApiResponse<StudentResponse>> CreateStudentAsync(CreateStudentRequest request, string host)
         {
@@ -295,8 +325,6 @@ namespace Access.API.Services.Implementation
                 response.Message = string.Join(',', updateResult.Errors.Select(a => a.Description));
                 return response;
             }
-
-            var si = _httpContext.Connection.ToString();
      
             return response;
         }

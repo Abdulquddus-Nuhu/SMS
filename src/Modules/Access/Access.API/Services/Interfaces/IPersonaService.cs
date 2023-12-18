@@ -1,4 +1,5 @@
-﻿using Access.Models.Requests;
+﻿using Access.API.Models.Requests;
+using Access.Models.Requests;
 using Access.Models.Responses;
 using Shared.Models.Responses;
 
@@ -8,6 +9,7 @@ namespace Access.API.Services.Interfaces
     {
         public Task<ApiResponse<ParentResponse>> CreateParentAsync(CreateParentRequest request, string host);
         public Task<ApiResponse<List<ParentResponse>>> ParentListAsync();
+        public Task<BaseResponse> EditParentAsync(Guid parentId, EditParentRequest request, string editor);
         public Task<ApiResponse<ParentResponse>> GetParentAsync(Guid parentId);
         public Task<BaseResponse> DeleteParentAsync(Guid parentId, string deletor);
         public Task<ApiResponse<StudentResponse>> CreateStudentAsync(CreateStudentRequest request, string host);
