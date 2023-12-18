@@ -1,4 +1,5 @@
-﻿using Access.API.Services.Interfaces;
+﻿using Access.API.Models.Requests;
+using Access.API.Services.Interfaces;
 using Access.Models.Requests;
 using Access.Models.Responses;
 using MediatR;
@@ -280,13 +281,13 @@ namespace Access.API.Controllers
 
         //edit student 
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)] // Adjust the authorization policy as needed
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
-    Summary = "Edit Student Endpoint",
-    Description = "This endpoint edits a student. It requires Admin privilege",
-    OperationId = "student.edit",
-    Tags = new[] { "PersonaEndpoints" })
-]
+        Summary = "Edit Student Endpoint",
+        Description = "This endpoint edits a student. It requires Admin privilege",
+        OperationId = "student.edit",
+        Tags = new[] { "PersonaEndpoints" })
+        ]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(ApiResponse<StudentResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
@@ -297,6 +298,27 @@ namespace Access.API.Controllers
         public async Task<ActionResult<ApiResponse<StudentResponse>>> EditStudentAsync(Guid studentId, [FromBody] EditStudentRequest request)
         {
             var response = await _personaService.EditStudentAsync(studentId, request, User.Identity!.Name ?? string.Empty);
+            return HandleResult(response);
+        }
+
+
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [SwaggerOperation(
+         Summary = "Edit Parent Endpoint",
+         Description = "This endpoint edits a parent. It requires Admin privilege",
+         OperationId = "parent.edit",
+         Tags = new[] { "PersonaEndpoints" })
+         ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPut("edit-parent")]
+        public async Task<ActionResult<BaseResponse>> EditParentAsync(Guid parentId, [FromBody] EditParentRequest request)
+        {
+            var response = await _personaService.EditParentAsync(parentId, request, User.Identity!.Name ?? string.Empty);
             return HandleResult(response);
         }
 

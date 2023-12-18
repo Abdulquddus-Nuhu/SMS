@@ -8,10 +8,9 @@ using System.Threading.Tasks;
 
 namespace Access.Core.Interfaces.Repositories
 {
-    public interface ICampusRepository
+    public interface IBusRepository
     {
-        public Task<BaseResponse> AddCampus(Campus campus);
-        public Task<IQueryable<Campus>> GetAllAsync();
-        public Task<IQueryable<Campus>> GetCampusWithGradesAsync();
+        public Task<BaseResponse> AddBus(Bus bus);
+        public Task<IQueryable<Bus>> GetAllAsync();
     }
 }

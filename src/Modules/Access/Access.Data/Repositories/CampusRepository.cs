@@ -42,6 +42,11 @@ namespace Access.Data.Repositories
         {
             return _dbContext.Campuses.AsQueryable().AsNoTracking();
         }
+        
+        public async Task<IQueryable<Campus>> GetCampusWithGradesAsync()
+        {
+            return _dbContext.Campuses.Include(x => x.Grades).AsQueryable().AsNoTracking();
+        }
 
         public async Task<Campus> GetByIdAsync(Guid id)
         {

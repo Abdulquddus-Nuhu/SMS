@@ -13,6 +13,8 @@ using System;
 using Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Access.API.Models.Requests;
+using MediatR;
+using Access.API.Events;
 
 namespace Access.API.Services.Implementation
 {
@@ -23,18 +25,21 @@ namespace Access.API.Services.Implementation
         private readonly HttpContext _httpContext;
         private readonly AccessDbContext _dbContext;
         private readonly IWebHostEnvironment _webHost;
+        private readonly IMediator _mediator;
 
         public PersonaService(UserManager<Persona> userManager,
             ILogger<PersonaService> logger,
             IHttpContextAccessor httpContextAccessor,
             AccessDbContext dbContext,
-            IWebHostEnvironment webHost)
+            IWebHostEnvironment webHost,
+            IMediator mediator)
         {
             _userManager = userManager;
             _logger = logger;
             _httpContext = httpContextAccessor.HttpContext!;
             _dbContext = dbContext;
             _webHost = webHost;
+            _mediator = mediator;
         }
 
 
@@ -63,57 +68,10 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            string UploadParentPhoto(IFormFile photo)
-            {
-                string path = Path.Combine(_webHost.ContentRootPath, "static", "parent-images");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-
-                if (photo != null && photo.Length > 0)
-                {
-                    //Getting FileName
-                    var fileName = Path.GetFileName(photo.FileName);
-                    //Assigning Unique Filename (Guid)
-                    var myUniqueFileName = Convert.ToString(Guid.NewGuid());
-                    //Getting file Extension
-                    var fileExtension = Path.GetExtension(fileName);
-                    // concatenating  FileName + FileExtension
-                    var newFileName = String.Concat("parent-", myUniqueFileName, fileExtension);
-
-                    // Combines two strings into a path.
-                    string filepath = string.Empty;
-                    try
-                    {
-                        filepath = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "static", "parent-images")).Root + $"{newFileName}";
-                        using (FileStream fs = System.IO.File.Create(filepath))
-                        {
-                            request.Photo.CopyTo(fs);
-                            fs.Flush();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogInformation("Error while uploading photo");
-                        _logger.LogError(ex.Message);
-                    }
-
-                    string prefixToRemove = Path.Combine(Directory.GetCurrentDirectory());
-                    if (filepath.StartsWith(prefixToRemove))
-                    {
-                        filepath = filepath.Substring(prefixToRemove.Length);
-                        Console.WriteLine(filepath);
-                    }
-
-                    return filepath;
-                }
-
-                return string.Empty;
-            }
-
             _logger.LogInformation("Creating a new Parent");
-            var photoUrl = UploadParentPhoto(request.Photo);
+            _logger.LogInformation("Trying to upload photo of new Parent");
+
+            string photoUrl = UploadPhoto(request.Photo, "parent-images", "parent-");
             if (string.IsNullOrWhiteSpace(photoUrl))
             {
                 response.Status = false;
@@ -121,6 +79,7 @@ namespace Access.API.Services.Implementation
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
+            _logger.LogInformation("Photo uploaded sucessfuly");
 
 
             var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, PesonaType = PersonaType.Parent };
@@ -138,19 +97,53 @@ namespace Access.API.Services.Implementation
             var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.PARENT);
             if (!roleResult.Succeeded)
             {
+                _logger.LogInformation("Unable add user to Parent role.");
+                response.Status = false;
                 response.Message = "Unable add user to Parent role.";
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
 
-            response.Data = new ParentResponse() { PhotoUrl = user.PhotoUrl, Email = user.Email, FirstName = user.FirstName, ParentId = user.Id, LastName = user.LastName, PhoneNumber = user.PhoneNumber, UserName = user.UserName, Role = AuthConstants.Roles.PARENT };
+            var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber};
+            _ = _mediator.Publish(new NewUserCreatedEvent(personaResponse, request.Password));
 
             //if (roleResult.Succeeded)
             //{
             //    await _auditTrailService.AddAsync(createTrail(AuditActions.Create, null, user.ToJson(), $"Created new user: {user.Email}"));
             //}
+            response.Data = new ParentResponse() { PhotoUrl = user.PhotoUrl, Email = user.Email, FirstName = user.FirstName, ParentId = user.Id, LastName = user.LastName, PhoneNumber = user.PhoneNumber, UserName = user.UserName, Role = AuthConstants.Roles.PARENT };
             return response;
         }
+
+        public async Task<BaseResponse> EditParentAsync(Guid parentId, EditParentRequest request, string editor)
+        {
+            var response = new BaseResponse();
+
+            var parent = await _userManager.FindByIdAsync(parentId.ToString());
+            if (parent is null)
+            {
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Status = false;
+                response.Message = "Parent not found";
+                return response;
+            }
+
+            parent.FirstName = request.FirstName ?? parent.FirstName;
+            parent.LastName = request.LastName ?? parent.LastName;
+            parent.Edit(editor);
+
+            var updateResult = await _userManager.UpdateAsync(parent);
+            if (!updateResult.Succeeded)
+            {
+                response.Code = ResponseCodes.Status500InternalServerError;
+                response.Status = false;
+                response.Message = string.Join(',', updateResult.Errors.Select(a => a.Description));
+                return response;
+            }
+
+            return response;
+        }
+
 
 
         public async Task<ApiResponse<StudentResponse>> CreateStudentAsync(CreateStudentRequest request, string host)
@@ -166,57 +159,10 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            string UploadStudentPhoto(IFormFile photo)
-            {
-                string path = Path.Combine(_webHost.ContentRootPath, "static", "student-images");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-
-                if (photo != null && photo.Length > 0)
-                {
-                    //Getting FileName
-                    var fileName = Path.GetFileName(photo.FileName);
-                    //Assigning Unique Filename (Guid)
-                    var myUniqueFileName = Convert.ToString(Guid.NewGuid());
-                    //Getting file Extension
-                    var fileExtension = Path.GetExtension(fileName);
-                    // concatenating  FileName + FileExtension
-                    var newFileName = String.Concat("student-", myUniqueFileName, fileExtension);
-
-                    // Combines two strings into a path.
-                    string filepath = string.Empty;
-                    try
-                    {
-                        filepath = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "static", "student-images")).Root + $"{newFileName}";
-                        using (FileStream fs = File.Create(filepath))
-                        {
-                            request.Photo.CopyTo(fs);
-                            fs.Flush();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogInformation("Error while uploading photo");
-                        _logger.LogError(ex.Message);
-                    }
-
-                    string prefixToRemove = Path.Combine(Directory.GetCurrentDirectory());
-                    if (filepath.StartsWith(prefixToRemove))
-                    {
-                        filepath = filepath.Substring(prefixToRemove.Length);
-                        Console.WriteLine(filepath);
-                    }
-
-                    return filepath;
-                }
-
-                return string.Empty;
-            }
-
             _logger.LogInformation("Creating a new Student");
-            var photoUrl = UploadStudentPhoto(request.Photo);
+            _logger.LogInformation("Trying to upload photo of new Student");
+
+            string photoUrl = UploadPhoto(request.Photo, "student-images", "student-");
             if (string.IsNullOrWhiteSpace(photoUrl))
             {
                 response.Status = false;
@@ -224,6 +170,7 @@ namespace Access.API.Services.Implementation
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
+            _logger.LogInformation("Photo uploaded sucessfuly");
 
             var user = new Persona() { FirstName = request.FirstName, LastName = request.LastName,Email = string.Concat(request.FirstName, "@", request.LastName, ".com"), UserName = string.Concat(request.FirstName, request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, ParentId = request.ParentId, BusServiceRequired = request.BusServiceRequired, GradeId = request.GradeId, EmailConfirmed = true };
             var creationResult = await _userManager.CreateAsync(user);
@@ -240,6 +187,8 @@ namespace Access.API.Services.Implementation
             var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.STUDENT);
             if (!roleResult.Succeeded)
             {
+                _logger.LogInformation("Unable add user to Student role.");
+                response.Status = false;
                 response.Message = "Unable add user to Student role.";
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
@@ -255,12 +204,6 @@ namespace Access.API.Services.Implementation
             return response;
         }
        
-        
-        
-        
-        // this is to edit student
-       
-        
         
         public async Task<ApiResponse<StudentResponse>> EditStudentAsync(Guid studentId, EditStudentRequest request, string editor)
         {
@@ -295,11 +238,9 @@ namespace Access.API.Services.Implementation
                 response.Message = string.Join(',', updateResult.Errors.Select(a => a.Description));
                 return response;
             }
-
      
             return response;
         }
-
 
 
         public async Task<BaseResponse> CreateBusDriverAsync(CreateBusDriverRequest request, string host)
@@ -314,58 +255,10 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            string UploadBusDriverPhoto(IFormFile photo)
-            {
-                string path = Path.Combine(_webHost.ContentRootPath, "static", "busdriver-images");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-
-                if (photo != null && photo.Length > 0)
-                {
-                    //Getting FileName
-                    var fileName = Path.GetFileName(photo.FileName);
-                    //Assigning Unique Filename (Guid)
-                    var myUniqueFileName = Convert.ToString(Guid.NewGuid());
-                    //Getting file Extension
-                    var fileExtension = Path.GetExtension(fileName);
-                    // concatenating  FileName + FileExtension
-                    var newFileName = String.Concat("busdriver-", myUniqueFileName, fileExtension);
-
-                    // Combines two strings into a path.
-                    string filepath = string.Empty;
-                    try
-                    {
-                        filepath = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "static", "busdriver-images")).Root + $"{newFileName}";
-                        using (FileStream fs = System.IO.File.Create(filepath))
-                        {
-                            request.Photo.CopyTo(fs);
-                            fs.Flush();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogInformation("Error while uploading photo");
-                        _logger.LogError(ex.Message);
-                    }
-
-                    string prefixToRemove = Path.Combine(Directory.GetCurrentDirectory());
-                    if (filepath.StartsWith(prefixToRemove))
-                    {
-                        filepath = filepath.Substring(prefixToRemove.Length);
-                        Console.WriteLine(filepath);
-                    }
-
-                    return filepath;
-                }
-
-                return string.Empty;
-            }
-
             _logger.LogInformation("Creating a new user");
+            _logger.LogInformation("Trying to upload photo of new Bus driver");
 
-            var photoUrl = UploadBusDriverPhoto(request.Photo);
+            string photoUrl = UploadPhoto(request.Photo, "busdriver-images", "busdriver-");
             if (string.IsNullOrWhiteSpace(photoUrl))
             {
                 _logger.LogInformation("Unable to upload bus driver photo. Please try again.");
@@ -374,6 +267,8 @@ namespace Access.API.Services.Implementation
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
+            _logger.LogInformation("Photo uploaded sucessfuly");
+
 
             var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, BusId = request.BusId, PesonaType = PersonaType.BusDriver };
             var creationResult = await _userManager.CreateAsync(user, request.Password);
@@ -387,13 +282,20 @@ namespace Access.API.Services.Implementation
             }
             _logger.LogInformation("Bus driver Creation is successful");
 
+
             var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.BUS_DRIVER);
             if (!roleResult.Succeeded)
             {
+                _logger.LogInformation("Unable add user to Bus driver role.");
                 response.Message = "Unable add user to Bus driver role.";
                 response.Code = ResponseCodes.Status500InternalServerError;
+                response.Status = false;
                 return response;
             }
+
+
+            var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber };
+            _ = _mediator.Publish(new NewUserCreatedEvent(personaResponse, request.Password));
 
             return response;
         }
@@ -410,58 +312,10 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            string UploadStaffPhoto(IFormFile photo)
-            {
-                string path = Path.Combine(_webHost.ContentRootPath, "static", "staff-images");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-
-                if (photo != null && photo.Length > 0)
-                {
-                    //Getting FileName
-                    var fileName = Path.GetFileName(photo.FileName);
-                    //Assigning Unique Filename (Guid)
-                    var myUniqueFileName = Convert.ToString(Guid.NewGuid());
-                    //Getting file Extension
-                    var fileExtension = Path.GetExtension(fileName);
-                    // concatenating  FileName + FileExtension
-                    var newFileName = String.Concat("staff-", myUniqueFileName, fileExtension);
-
-                    // Combines two strings into a path.
-                    string filepath = string.Empty;
-                    try
-                    {
-                        filepath = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "static", "staff-images")).Root + $"{newFileName}";
-                        using (FileStream fs = System.IO.File.Create(filepath))
-                        {
-                            request.Photo.CopyTo(fs);
-                            fs.Flush();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogInformation("Error while uploading photo");
-                        _logger.LogError(ex.Message);
-                    }
-
-                    string prefixToRemove = Path.Combine(Directory.GetCurrentDirectory());
-                    if (filepath.StartsWith(prefixToRemove))
-                    {
-                        filepath = filepath.Substring(prefixToRemove.Length);
-                        Console.WriteLine(filepath);
-                    }
-
-                    return filepath;
-                }
-
-                return string.Empty;
-            }
-
             _logger.LogInformation("Creating a new staff");
+            _logger.LogInformation("Trying to upload photo of new Staff");
 
-            var photoUrl = UploadStaffPhoto(request.Photo);
+            string photoUrl = UploadPhoto(request.Photo, "staff-images", "staff-");
             if (string.IsNullOrWhiteSpace(photoUrl))
             {
                 _logger.LogInformation("Unable to upload staff photo. Please try again.");
@@ -470,6 +324,8 @@ namespace Access.API.Services.Implementation
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
+            _logger.LogInformation("Photo uploaded sucessfuly");
+
 
             var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, PesonaType = PersonaType.Staff, DepartmentId = request.DepartmentId, JobTitleId = request.JobTitleId };
             var creationResult = await _userManager.CreateAsync(user, request.Password);
@@ -489,8 +345,13 @@ namespace Access.API.Services.Implementation
                 _logger.LogInformation("Unable add user to Staff role.");
                 response.Message = "Unable add user to Staff role.";
                 response.Code = ResponseCodes.Status500InternalServerError;
+                response.Status = false;
                 return response;
             }
+
+
+            var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber };
+            _ = _mediator.Publish(new NewUserCreatedEvent(personaResponse, request.Password));
 
             return response;
         }
@@ -720,6 +581,57 @@ namespace Access.API.Services.Implementation
             return response;
         }
 
+
+        private string UploadPhoto(IFormFile? photo, string folder, string fileNameAlias)
+        {
+            string folderPath = "static";
+
+            string path = Path.Combine(_webHost.ContentRootPath, folderPath, folder);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            if (photo != null && photo.Length > 0)
+            {
+                //Getting FileName
+                var fileName = Path.GetFileName(photo.FileName);
+                //Assigning Unique Filename (Guid)
+                var myUniqueFileName = Convert.ToString(Guid.NewGuid());
+                //Getting file Extension
+                var fileExtension = Path.GetExtension(fileName);
+                // concatenating  FileName + FileExtension
+                var newFileName = String.Concat(fileNameAlias, myUniqueFileName, fileExtension);
+
+                // Combines two strings into a path.
+                string filepath = string.Empty;
+                try
+                {
+                    filepath = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), folderPath, folder)).Root + $"{newFileName}";
+                    using (FileStream fs = File.Create(filepath))
+                    {
+                        photo?.CopyTo(fs);
+                        fs.Flush();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation("Error while uploading photo");
+                    _logger.LogError(ex.Message);
+                }
+
+                string prefixToRemove = Path.Combine(Directory.GetCurrentDirectory());
+                if (filepath.StartsWith(prefixToRemove))
+                {
+                    filepath = filepath.Substring(prefixToRemove.Length);
+                    Console.WriteLine(filepath);
+                }
+
+                return filepath;
+            }
+
+            return string.Empty;
+        }
 
     }
 
