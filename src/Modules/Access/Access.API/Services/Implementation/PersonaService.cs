@@ -13,6 +13,7 @@ using System;
 using Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Access.API.Models.Requests;
+using MediatR;
 
 namespace Access.API.Services.Implementation
 {
@@ -89,7 +90,7 @@ namespace Access.API.Services.Implementation
                         filepath = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "static", "parent-images")).Root + $"{newFileName}";
                         using (FileStream fs = System.IO.File.Create(filepath))
                         {
-                            request.Photo.CopyTo(fs);
+                            request?.Photo.CopyTo(fs);
                             fs.Flush();
                         }
                     }
@@ -343,6 +344,7 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
+            //string  d = UploadPhoto(request.Photo, "busdriver-images", "busdriver-");
             string UploadBusDriverPhoto(IFormFile? photo)
             {
                 string path = Path.Combine(_webHost.ContentRootPath, "static", "busdriver-images");
@@ -392,7 +394,8 @@ namespace Access.API.Services.Implementation
 
             _logger.LogInformation("Creating a new user");
 
-            var photoUrl = UploadBusDriverPhoto(request.Photo);
+            //var photoUrl = UploadBusDriverPhoto(request.Photo);
+            var photoUrl = UploadPhoto(request.Photo, "busdriver-images", "busdriver-");
             if (string.IsNullOrWhiteSpace(photoUrl))
             {
                 _logger.LogInformation("Unable to upload bus driver photo. Please try again.");
@@ -745,6 +748,57 @@ namespace Access.API.Services.Implementation
             return response;
         }
 
+
+        private string UploadPhoto(IFormFile? photo, string folder, string fileNameAlias)
+        {
+            string folderPath = "static";
+
+            string path = Path.Combine(_webHost.ContentRootPath, folderPath, folder);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            if (photo != null && photo.Length > 0)
+            {
+                //Getting FileName
+                var fileName = Path.GetFileName(photo.FileName);
+                //Assigning Unique Filename (Guid)
+                var myUniqueFileName = Convert.ToString(Guid.NewGuid());
+                //Getting file Extension
+                var fileExtension = Path.GetExtension(fileName);
+                // concatenating  FileName + FileExtension
+                var newFileName = String.Concat(fileNameAlias, myUniqueFileName, fileExtension);
+
+                // Combines two strings into a path.
+                string filepath = string.Empty;
+                try
+                {
+                    filepath = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), folderPath, folder)).Root + $"{newFileName}";
+                    using (FileStream fs = File.Create(filepath))
+                    {
+                        photo?.CopyTo(fs);
+                        fs.Flush();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation("Error while uploading photo");
+                    _logger.LogError(ex.Message);
+                }
+
+                string prefixToRemove = Path.Combine(Directory.GetCurrentDirectory());
+                if (filepath.StartsWith(prefixToRemove))
+                {
+                    filepath = filepath.Substring(prefixToRemove.Length);
+                    Console.WriteLine(filepath);
+                }
+
+                return filepath;
+            }
+
+            return string.Empty;
+        }
 
     }
 
