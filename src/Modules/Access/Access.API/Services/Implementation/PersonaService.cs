@@ -14,6 +14,7 @@ using Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Access.API.Models.Requests;
 using MediatR;
+using Access.API.Events;
 
 namespace Access.API.Services.Implementation
 {
@@ -24,18 +25,21 @@ namespace Access.API.Services.Implementation
         private readonly HttpContext _httpContext;
         private readonly AccessDbContext _dbContext;
         private readonly IWebHostEnvironment _webHost;
+        private readonly IMediator _mediator;
 
         public PersonaService(UserManager<Persona> userManager,
             ILogger<PersonaService> logger,
             IHttpContextAccessor httpContextAccessor,
             AccessDbContext dbContext,
-            IWebHostEnvironment webHost)
+            IWebHostEnvironment webHost,
+            IMediator mediator)
         {
             _userManager = userManager;
             _logger = logger;
             _httpContext = httpContextAccessor.HttpContext!;
             _dbContext = dbContext;
             _webHost = webHost;
+            _mediator = mediator;
         }
 
 
@@ -100,12 +104,14 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            response.Data = new ParentResponse() { PhotoUrl = user.PhotoUrl, Email = user.Email, FirstName = user.FirstName, ParentId = user.Id, LastName = user.LastName, PhoneNumber = user.PhoneNumber, UserName = user.UserName, Role = AuthConstants.Roles.PARENT };
+            var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber};
+            _ = _mediator.Publish(new NewUserCreatedEvent(personaResponse, request.Password));
 
             //if (roleResult.Succeeded)
             //{
             //    await _auditTrailService.AddAsync(createTrail(AuditActions.Create, null, user.ToJson(), $"Created new user: {user.Email}"));
             //}
+            response.Data = new ParentResponse() { PhotoUrl = user.PhotoUrl, Email = user.Email, FirstName = user.FirstName, ParentId = user.Id, LastName = user.LastName, PhoneNumber = user.PhoneNumber, UserName = user.UserName, Role = AuthConstants.Roles.PARENT };
             return response;
         }
 
@@ -288,6 +294,9 @@ namespace Access.API.Services.Implementation
             }
 
 
+            var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber };
+            _ = _mediator.Publish(new NewUserCreatedEvent(personaResponse, request.Password));
+
             return response;
         }
 
@@ -339,6 +348,10 @@ namespace Access.API.Services.Implementation
                 response.Status = false;
                 return response;
             }
+
+
+            var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber };
+            _ = _mediator.Publish(new NewUserCreatedEvent(personaResponse, request.Password));
 
             return response;
         }
