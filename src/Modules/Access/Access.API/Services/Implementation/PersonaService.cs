@@ -347,6 +347,16 @@ namespace Access.API.Services.Implementation
         public async Task<BaseResponse> CreateBusDriverAsync(CreateBusDriverRequest request, string host)
         {
             var response = new BaseResponse() { Code = ResponseCodes.Status201Created };
+
+            bool isBusSelected = await _dbContext.Busdrivers.AnyAsync(x => x.BusId == request.BusId);
+            if (isBusSelected)
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status400BadRequest;
+                response.Message = "Please select another bus. This bus number has a driver attached to it";
+                return response;
+            }
+
             if (!string.Equals(request.Password, request.ConfirmPassword))
             {
                 _logger.LogInformation("Password Field not the same as that of ConfirmPassword field");
@@ -391,14 +401,14 @@ namespace Access.API.Services.Implementation
                 PersonaId = user.Id,
                 Email = request.Email,
                 PhoneNumber = request.PhoneNumber,
+                BusId = request.BusId,
             };
-            await _dbContext.AddAsync(busDriver);
-            await _dbContext.TrySaveChangesAsync();
+            await _dbContext.Busdrivers.AddAsync(busDriver);
             if (!await _dbContext.TrySaveChangesAsync())
             {
-                _logger.LogInformation("Unable create Parent entity.");
+                _logger.LogInformation("Unable create Bus driver entity.");
                 response.Status = false;
-                response.Message = "Unable create Parent entity.";
+                response.Message = "Unable create Bus Driver entity.";
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
@@ -457,6 +467,26 @@ namespace Access.API.Services.Implementation
                 response.Status = false;
                 response.Message = string.Join(',', creationResult.Errors.Select(a => a.Description));
                 _logger.LogInformation("Staff Creation is not successful with the following error {0}", response.Message);
+                return response;
+            }
+
+            var staff = new Staff()
+            {
+                Id = Guid.NewGuid(),
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                PhotoUrl = photoUrl,
+                PersonaId = user.Id,
+                Email = request.Email,
+                PhoneNumber = request.PhoneNumber,
+            };
+            await _dbContext.Staffs.AddAsync(staff);
+            if (!await _dbContext.TrySaveChangesAsync())
+            {
+                _logger.LogInformation("Unable create Bus driver entity.");
+                response.Status = false;
+                response.Message = "Unable create Bus Driver entity.";
+                response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
             _logger.LogInformation("Staff Creation is successful");
@@ -559,8 +589,7 @@ namespace Access.API.Services.Implementation
         {
             var response = new ApiResponse<List<StaffResponse>>();
 
-            var staff = _dbContext.Users
-                .Where(x => x.PesonaType == PersonaType.Staff)
+            var staff = _dbContext.Staffs
                 .Select(x => new StaffResponse()
                 {
                     StaffId = x.Id,
@@ -577,8 +606,7 @@ namespace Access.API.Services.Implementation
         {
             var response = new ApiResponse<List<BusDriverResponse>>();
 
-            var busdrivers = _dbContext.Users
-                .Where(x => x.PesonaType == PersonaType.BusDriver)
+            var busdrivers = _dbContext.Busdrivers
                 .Select(x => new BusDriverResponse()
                 {
                     BusDriverId = x.Id,

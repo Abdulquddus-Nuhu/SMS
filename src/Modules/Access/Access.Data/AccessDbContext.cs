@@ -25,6 +25,8 @@ namespace Access.Data
         public DbSet<Student> Students { get; set; }
         public DbSet<Parent> Parents { get; set; }
         public DbSet<ParentStudent> ParentStudent { get; set; }
+        public DbSet<Busdriver> Busdrivers { get; set; }
+        public DbSet<Staff> Staffs { get; set; }
         public DbSet<Campus> Campuses { get; set; }
         public DbSet<Grade> Grades { get; set; }
         public DbSet<JobTitle> JobTitles { get; set; }
