@@ -3,6 +3,7 @@ using System;
 using Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Access.Data.Migrations
 {
     [DbContext(typeof(AccessDbContext))]
-    partial class AccessDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240113125158_NewEntities")]
+    partial class NewEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -667,21 +670,6 @@ namespace Access.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ParentStudent", b =>
-                {
-                    b.Property<Guid>("ParentsId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("StudentsId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("ParentsId", "StudentsId");
-
-                    b.HasIndex("StudentsId");
-
-                    b.ToTable("ParentStudent");
-                });
-
             modelBuilder.Entity("Access.Core.Entities.Grade", b =>
                 {
                     b.HasOne("Access.Core.Entities.Campus", "Campus")
@@ -757,21 +745,6 @@ namespace Access.Data.Migrations
                     b.HasOne("Access.Data.Identity.Persona", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ParentStudent", b =>
-                {
-                    b.HasOne("Access.Core.Entities.Users.Parent", null)
-                        .WithMany()
-                        .HasForeignKey("ParentsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Access.Core.Entities.Users.Student", null)
-                        .WithMany()
-                        .HasForeignKey("StudentsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

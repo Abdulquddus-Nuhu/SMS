@@ -21,6 +21,7 @@ namespace Access.Models.Requests
 
         [Required]
         public bool BusServiceRequired { get; init; }
+        public Guid? BusId { get; set; }
 
         [Required]
         public IFormFile? Photo { get; set; }

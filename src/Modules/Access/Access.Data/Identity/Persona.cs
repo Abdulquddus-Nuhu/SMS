@@ -20,24 +20,24 @@ namespace Access.Data.Identity
 
         //Staff
         //public string? JobTitle { get; set; } = string.Empty;
-        public Guid? JobTitleId { get; set; }
-        public JobTitle? JobTitle { get; set; }
+        //public Guid? JobTitleId { get; set; }
+        //public JobTitle? JobTitle { get; set; }
         //public string? Department { get; set; } = string.Empty;
-        public Guid? DepartmentId { get; set; } 
-        public Department? Department { get; set; }
+        //public Guid? DepartmentId { get; set; } 
+        //public Department? Department { get; set; }
 
         //Student
-        public Guid? ParentId { get; set; }
+        //public Guid? ParentId { get; set; }
         //public string? Grade { get; set; } = string.Empty;
-        public Guid? GradeId { get; set; }
-        public Grade? Grade { get; set; }
-        public bool? BusServiceRequired { get; set; }
+        //public Guid? GradeId { get; set; }
+        //public Grade? Grade { get; set; }
+        //public bool? BusServiceRequired { get; set; }
 
 
         //Bus driver
         //public string? BusNumber { get; set; } = string.Empty;
-        public Guid? BusId { get; set; }
-        public Bus? Bus { get; set; }
+        //public Guid? BusId { get; set; }
+        //public Bus? Bus { get; set; }
 
         public Persona(DateTime created, bool isDeleted)
         {

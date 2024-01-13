@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Access.API.Models.Requests;
 using MediatR;
 using Access.API.Events;
+using Access.Core.Entities.Users;
 
 namespace Access.API.Services.Implementation
 {
@@ -82,7 +83,7 @@ namespace Access.API.Services.Implementation
             _logger.LogInformation("Photo uploaded sucessfuly");
 
 
-            var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, PesonaType = PersonaType.Parent };
+            var user = new Persona() { Id = Guid.NewGuid() ,UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, PesonaType = PersonaType.Parent };
             var creationResult = await _userManager.CreateAsync(user, request.Password);
             if (!creationResult.Succeeded)
             {
@@ -92,7 +93,28 @@ namespace Access.API.Services.Implementation
                 _logger.LogInformation("Parent Creation is not successful with the following error {0}", response.Message);
                 return response;
             }
+
+            var parent = new Parent()
+            {
+                Id = Guid.NewGuid(),
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                PhotoUrl = photoUrl,
+                PersonaId = user.Id,
+                Email = request.Email,
+                PhoneNumber = request.PhoneNumber,
+            };
+            await _dbContext.Parents.AddAsync(parent);
+            if (!await _dbContext.TrySaveChangesAsync())
+            {
+                _logger.LogInformation("Unable create Parent entity.");
+                response.Status = false;
+                response.Message = "Unable create Parent entity.";
+                response.Code = ResponseCodes.Status500InternalServerError;
+                return response;
+            }
             _logger.LogInformation("Parent Creation is successful");
+
 
             var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.PARENT);
             if (!roleResult.Succeeded)
@@ -111,7 +133,7 @@ namespace Access.API.Services.Implementation
             //{
             //    await _auditTrailService.AddAsync(createTrail(AuditActions.Create, null, user.ToJson(), $"Created new user: {user.Email}"));
             //}
-            response.Data = new ParentResponse() { PhotoUrl = user.PhotoUrl, Email = user.Email, FirstName = user.FirstName, ParentId = user.Id, LastName = user.LastName, PhoneNumber = user.PhoneNumber, UserName = user.UserName, Role = AuthConstants.Roles.PARENT };
+            response.Data = new ParentResponse() { PhotoUrl = user.PhotoUrl, Email = user.Email, FirstName = user.FirstName, ParentId = parent.Id, LastName = user.LastName, PhoneNumber = user.PhoneNumber, UserName = user.UserName, Role = AuthConstants.Roles.PARENT };
             return response;
         }
 
@@ -119,7 +141,7 @@ namespace Access.API.Services.Implementation
         {
             var response = new BaseResponse();
 
-            var parent = await _userManager.FindByIdAsync(parentId.ToString());
+            var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Id == parentId);
             if (parent is null)
             {
                 response.Code = ResponseCodes.Status404NotFound;
@@ -132,14 +154,26 @@ namespace Access.API.Services.Implementation
             parent.LastName = request.LastName ?? parent.LastName;
             parent.Edit(editor);
 
-            var updateResult = await _userManager.UpdateAsync(parent);
-            if (!updateResult.Succeeded)
+            if (!(await _dbContext.TrySaveChangesAsync()))
             {
                 response.Code = ResponseCodes.Status500InternalServerError;
                 response.Status = false;
-                response.Message = string.Join(',', updateResult.Errors.Select(a => a.Description));
+                response.Message = "Unable to update parent";
                 return response;
             }
+
+            var persona = await _userManager.FindByIdAsync(parent.PersonaId.ToString());
+            if (persona is null)
+            {
+                _logger.LogInformation("Parent account not found. Update not completed");
+            }
+            else
+            {
+                persona.FirstName = request.FirstName ?? persona.FirstName;
+                persona.LastName = request.LastName ?? persona.LastName;
+                await _userManager.UpdateAsync(persona);
+            }
+
 
             return response;
         }
@@ -150,7 +184,7 @@ namespace Access.API.Services.Implementation
         {
             var response = new ApiResponse<StudentResponse>() { Code = ResponseCodes.Status201Created };
 
-            var parent = await _userManager.FindByIdAsync(request.ParentId.ToString());
+            var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Id == request.ParentId);
             if (parent is null)
             {
                 response.Code = ResponseCodes.Status400BadRequest;
@@ -172,7 +206,20 @@ namespace Access.API.Services.Implementation
             }
             _logger.LogInformation("Photo uploaded sucessfuly");
 
-            var user = new Persona() { FirstName = request.FirstName, LastName = request.LastName,Email = string.Concat(request.FirstName, "@", request.LastName, ".com"), UserName = string.Concat(request.FirstName, request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, ParentId = request.ParentId, BusServiceRequired = request.BusServiceRequired, GradeId = request.GradeId, EmailConfirmed = true };
+            Persona user;
+            string emailExist = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com");
+
+            int sameEmailCount = await _dbContext.Users.CountAsync(x => x.Email == emailExist);
+            if (sameEmailCount is not 0)
+            {
+                emailExist = string.Concat(request.FirstName, request.LastName,$"{sameEmailCount++}","@","smsabuja", ".com");
+                user = new Persona() { Id = Guid.NewGuid(), FirstName = request.FirstName, LastName = request.LastName, Email = emailExist, UserName = string.Concat(request.FirstName," ", request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, EmailConfirmed = true };
+            }
+            else
+            {
+                user = new Persona() { Id = Guid.NewGuid(), FirstName = request.FirstName, LastName = request.LastName, Email = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com"), UserName = string.Concat(request.FirstName," ",  request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, EmailConfirmed = true };
+            }
+
             var creationResult = await _userManager.CreateAsync(user);
             if (!creationResult.Succeeded)
             {
@@ -182,6 +229,58 @@ namespace Access.API.Services.Implementation
                 _logger.LogInformation("Student Creation is not successful with the following error {0}", response.Message);
                 return response;
             }
+
+            Student student;
+
+            if (request.BusServiceRequired)
+            {
+                student = new Student()
+                {
+                    Id = Guid.NewGuid(),
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    PhotoUrl = photoUrl,
+                    PersonaId = user.Id,
+                    Email = user.Email,
+                    GradeId = request.GradeId,
+                    BusId = request.BusId,
+                    BusServiceRequired = request.BusServiceRequired,
+                };
+            }
+            else
+            {
+                student = new Student()
+                {
+                    Id = Guid.NewGuid(),
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    PhotoUrl = photoUrl,
+                    PersonaId = user.Id,
+                    Email = user.Email,
+                    GradeId = request.GradeId,
+                    BusServiceRequired = request.BusServiceRequired,
+                };
+            }
+
+
+            await _dbContext.Students.AddAsync(student);
+            if (!await _dbContext.TrySaveChangesAsync())
+            {
+                _logger.LogInformation("Unable create Student entity.");
+                response.Status = false;
+                response.Message = "Unable create Students entity.";
+                response.Code = ResponseCodes.Status500InternalServerError;
+                return response;
+            }
+
+            var parentStudent = new ParentStudent()
+            {
+                StudentsId = student.Id,
+                ParentsId = parent.Id,
+            };
+            await _dbContext.ParentStudent.AddAsync(parentStudent);
+            await _dbContext.TrySaveChangesAsync();
+
             _logger.LogInformation("Student Creation is successful");
 
             var roleResult = await _userManager.AddToRoleAsync(user, AuthConstants.Roles.STUDENT);
@@ -194,8 +293,7 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            //response.Data = new StudentResponse() {StudentId = user.Id, PhotoUrl = user.PhotoUrl, FirstName = user.FirstName, BusServiceRequired = request.BusServiceRequired, Grade = request.Grade, LastName = user.LastName, Role = AuthConstants.Roles.STUDENT };
-            response.Data = new StudentResponse() {StudentId = user.Id, PhotoUrl = user.PhotoUrl, FirstName = user.FirstName, BusServiceRequired = request.BusServiceRequired, LastName = user.LastName, Role = AuthConstants.Roles.STUDENT };
+            response.Data = new StudentResponse() {StudentId = student.Id, PhotoUrl = user.PhotoUrl, FirstName = user.FirstName, BusServiceRequired = request.BusServiceRequired, LastName = user.LastName, Role = AuthConstants.Roles.STUDENT };
 
             //if (roleResult.Succeeded)
             //{
@@ -209,8 +307,7 @@ namespace Access.API.Services.Implementation
         {
             var response = new ApiResponse<StudentResponse>();
 
-            // Find the student to edit
-            var student = await _userManager.FindByIdAsync(studentId.ToString());
+            var student = await _dbContext.Students.FirstOrDefaultAsync(x => x.Id == studentId);
             if (student is null)
             {
                 response.Code = ResponseCodes.Status404NotFound;
@@ -219,24 +316,28 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            // Update student properties based on the request
             student.FirstName = request.FirstName ?? student.FirstName;
             student.LastName = request.LastName ??  student.LastName;
-            student.GradeId = request.GradeId ?? student.GradeId;
-            student.BusServiceRequired = request.BusServiceRequired;
-            student.Edit(editor);
+            student.Edit(editor);          
 
-            // Check if a new photo is provided and update PhotoUrl accordingly
-          
-
-            // Update the student in the database
-            var updateResult = await _userManager.UpdateAsync(student);
-            if (!updateResult.Succeeded)
+            if (!(await _dbContext.TrySaveChangesAsync()))
             {
                 response.Code = ResponseCodes.Status500InternalServerError;
                 response.Status = false;
-                response.Message = string.Join(',', updateResult.Errors.Select(a => a.Description));
+                response.Message = "Unable to update student";
                 return response;
+            }
+
+            var persona = await _userManager.FindByIdAsync(student.PersonaId.ToString());
+            if (persona is null)
+            {
+                _logger.LogInformation("Student account not found. Update not completed");
+            }
+            else 
+            {
+                persona.FirstName = request.FirstName ?? persona.FirstName;
+                persona.LastName = request.LastName ?? persona.LastName;
+                await _userManager.UpdateAsync(persona);
             }
      
             return response;
@@ -270,7 +371,7 @@ namespace Access.API.Services.Implementation
             _logger.LogInformation("Photo uploaded sucessfuly");
 
 
-            var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, BusId = request.BusId, PesonaType = PersonaType.BusDriver };
+            var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl,  PesonaType = PersonaType.BusDriver };
             var creationResult = await _userManager.CreateAsync(user, request.Password);
             if (!creationResult.Succeeded)
             {
@@ -278,6 +379,27 @@ namespace Access.API.Services.Implementation
                 response.Status = false;
                 response.Message = string.Join(',', creationResult.Errors.Select(a => a.Description));
                 _logger.LogInformation("Bus driver Creation is not successful with the following error {0}", response.Message);
+                return response;
+            }
+
+            var busDriver = new Busdriver()
+            {
+                Id = Guid.NewGuid(),
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                PhotoUrl = photoUrl,
+                PersonaId = user.Id,
+                Email = request.Email,
+                PhoneNumber = request.PhoneNumber,
+            };
+            await _dbContext.AddAsync(busDriver);
+            await _dbContext.TrySaveChangesAsync();
+            if (!await _dbContext.TrySaveChangesAsync())
+            {
+                _logger.LogInformation("Unable create Parent entity.");
+                response.Status = false;
+                response.Message = "Unable create Parent entity.";
+                response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
             _logger.LogInformation("Bus driver Creation is successful");
@@ -327,7 +449,7 @@ namespace Access.API.Services.Implementation
             _logger.LogInformation("Photo uploaded sucessfuly");
 
 
-            var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, PesonaType = PersonaType.Staff, DepartmentId = request.DepartmentId, JobTitleId = request.JobTitleId };
+            var user = new Persona() { UserName = request.Email, Email = request.Email, PhoneNumber = request.PhoneNumber, FirstName = request.FirstName, LastName = request.LastName, EmailConfirmed = true, PhotoUrl = photoUrl, PesonaType = PersonaType.Staff };
             var creationResult = await _userManager.CreateAsync(user, request.Password);
             if (!creationResult.Succeeded)
             {
@@ -361,8 +483,7 @@ namespace Access.API.Services.Implementation
         {
             var response = new ApiResponse<List<ParentResponse>>();
 
-            var parents = await _dbContext.Users
-                .Where(x => x.PesonaType == PersonaType.Parent)
+            var parents = await _dbContext.Parents
                 .Select(x => new ParentResponse()
                 {
                     FirstName = x.FirstName,
@@ -375,11 +496,17 @@ namespace Access.API.Services.Implementation
                 .AsNoTracking()
                 .ToListAsync();
 
+            //foreach (var parent in parents)
+            //{
+            //    parent.NumberOfStudent = _dbContext.Students.Where(x => x.ParentId == parent.ParentId && x.IsDeleted == false).Count();
+
+            //}
+            
             foreach (var parent in parents)
             {
-                parent.NumberOfStudent = _dbContext.Users.Where(x => x.ParentId == parent.ParentId && x.IsDeleted == false).Count();
-
+                parent.NumberOfStudent = _dbContext.ParentStudent.Where(x => x.ParentsId == parent.ParentId).Count();
             }
+
 
             response.Data = parents;
             return response;
@@ -389,16 +516,12 @@ namespace Access.API.Services.Implementation
         {
             var response = new ApiResponse<List<StudentResponse>>();
 
-            var students = _dbContext.Users
-                .Include(x => x.Grade)
-                .Where(x => x.PesonaType == PersonaType.Student)
+            var students = _dbContext.Students
                 .Select(x => new StudentResponse()
                 {
                     StudentId = x.Id,
                     FirstName = x.FirstName,
                     LastName = x.LastName,
-                    Grade = x.Grade.Name,
-                    BusServiceRequired = x.BusServiceRequired.Value,
                     PhotoUrl = x.PhotoUrl,
                 })
                 .AsNoTracking();
@@ -406,21 +529,24 @@ namespace Access.API.Services.Implementation
             response.Data = await students.ToListAsync();
             return response;
         }
+
 
         public async Task<ApiResponse<List<StudentResponse>>> ParentStudentsListAsync(Guid parentId)
         {
             var response = new ApiResponse<List<StudentResponse>>();
 
-            var students = _dbContext.Users
-                .Include(x => x.Grade)
-                .Where(x => x.PesonaType == PersonaType.Student && x.ParentId == parentId)
+            var studentIds = await _dbContext.ParentStudent
+                .Where(x => x.ParentsId == parentId)
+                .Select(x => x.StudentsId)
+                .ToListAsync();
+
+            var students = _dbContext.Students
+                .Where(x => studentIds.Contains(x.Id))
                 .Select(x => new StudentResponse()
                 {
                     StudentId = x.Id,
                     FirstName = x.FirstName,
                     LastName = x.LastName,
-                    Grade = x.Grade!.Name,
-                    BusServiceRequired = x.BusServiceRequired.Value,
                     PhotoUrl = x.PhotoUrl,
                 })
                 .AsNoTracking();
@@ -428,6 +554,7 @@ namespace Access.API.Services.Implementation
             response.Data = await students.ToListAsync();
             return response;
         }
+
         public async Task<ApiResponse<List<StaffResponse>>> StaffListAsync()
         {
             var response = new ApiResponse<List<StaffResponse>>();
@@ -451,7 +578,6 @@ namespace Access.API.Services.Implementation
             var response = new ApiResponse<List<BusDriverResponse>>();
 
             var busdrivers = _dbContext.Users
-                .Include(x => x.Bus)
                 .Where(x => x.PesonaType == PersonaType.BusDriver)
                 .Select(x => new BusDriverResponse()
                 {
@@ -459,7 +585,6 @@ namespace Access.API.Services.Implementation
                     FirstName = x.FirstName,
                     LastName = x.LastName,
                     PhotoUrl = x.PhotoUrl,
-                    BusNumber = x.Bus.Number,
 
                 })
                 .AsNoTracking();
@@ -470,10 +595,10 @@ namespace Access.API.Services.Implementation
 
         public async Task<BaseResponse> DeleteParentAsync(Guid parentId, string deletor)
         {
-            _logger.LogInformation("Trying to delete a user with id: {0}", parentId);
+            _logger.LogInformation("Trying to delete a parent with id: {0}", parentId);
             var response = new BaseResponse();
 
-            var parent = await _userManager.FindByIdAsync(parentId.ToString());
+            var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Id == parentId);
             if (parent is null)
             {
                 _logger.LogInformation("Parent with id: {0} not found", parentId);
@@ -485,13 +610,18 @@ namespace Access.API.Services.Implementation
 
             parent.Delete(deletor);
 
-            if (!(await _userManager.UpdateAsync(parent)).Succeeded)
+            if (!(await _dbContext.TrySaveChangesAsync()))
             {
                 response.Code = ResponseCodes.Status500InternalServerError;
                 response.Status = false;
                 response.Message = "Unable to delete parent! Please try again";
                 return response;
             }
+
+            var persona = await _userManager.FindByIdAsync(parent.PersonaId.ToString());
+            await _userManager.SetLockoutEnabledAsync(persona, true);
+            await _userManager.SetLockoutEndDateAsync(persona, DateTimeOffset.MaxValue);
+            await _userManager.UpdateAsync(persona);
 
             return response;
         }
@@ -501,7 +631,7 @@ namespace Access.API.Services.Implementation
             _logger.LogInformation("Trying to get a parent with id: {0}", parentId);
             var response = new ApiResponse<ParentResponse>() { Code = ResponseCodes.Status200OK };
 
-            var parent = await _userManager.FindByIdAsync(parentId.ToString());
+            var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Id == parentId);
             if (parent is null)
             {
                 _logger.LogInformation("Parent with id: {0} not found", parentId);
@@ -527,28 +657,33 @@ namespace Access.API.Services.Implementation
 
         public async Task<BaseResponse> DeleteStudnetAsync(Guid studentId, string deletor)
         {
-            _logger.LogInformation("Trying to delete a user with id: {0}", studentId);
+            _logger.LogInformation("Trying to delete a student with id: {0}", studentId);
             var response = new BaseResponse();
 
-            var student = await _userManager.FindByIdAsync(studentId.ToString());
+            var student = await _dbContext.Students.FirstOrDefaultAsync(x => x.Id == studentId);
             if (student is null)
             {
-                _logger.LogInformation("Parent with id: {0} not found", studentId);
+                _logger.LogInformation("Student with id: {0} not found", studentId);
                 response.Code = ResponseCodes.Status404NotFound;
-                response.Message = "Parent not found";
+                response.Message = "Student not found";
                 response.Status = false;
                 return response;
             }
 
             student.Delete(deletor);
 
-            if (!(await _userManager.UpdateAsync(student)).Succeeded)
+            if (!(await _dbContext.TrySaveChangesAsync()))
             {
                 response.Code = ResponseCodes.Status500InternalServerError;
                 response.Status = false;
                 response.Message = "Unable to delete student! Please try again";
                 return response;
             }
+
+            var persona = await _userManager.FindByIdAsync(student.PersonaId.ToString());
+            await _userManager.SetLockoutEnabledAsync(persona, true);
+            await _userManager.SetLockoutEndDateAsync(persona, DateTimeOffset.MaxValue);
+            await _userManager.UpdateAsync(persona);
 
             return response;
         }
@@ -558,8 +693,7 @@ namespace Access.API.Services.Implementation
             _logger.LogInformation("Trying to get a student with id: {0}", studentId);
             var response = new ApiResponse<StudentResponse>() { Code = ResponseCodes.Status200OK };
 
-            //var student = await _userManager.FindByIdAsync(studentId.ToString());
-            var student = await _dbContext.Users.Include(x => x.Grade).FirstOrDefaultAsync(x => x.Id == studentId);
+            var student = await _dbContext.Students.FirstOrDefaultAsync(x => x.Id == studentId);
             if (student is null)
             {
                 _logger.LogInformation("Student with id: {0} not found", studentId);
@@ -575,7 +709,6 @@ namespace Access.API.Services.Implementation
                 FirstName = student.FirstName,
                 LastName = student.LastName,
                 PhotoUrl = student.PhotoUrl ?? string.Empty,
-                Grade = student.Grade!.Name
             };
 
             return response;

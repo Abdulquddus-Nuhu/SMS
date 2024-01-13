@@ -1,4 +1,5 @@
 ﻿using Access.Core.Entities;
+using Access.Core.Entities.Users;
 using Access.Data.Config;
 using Access.Data.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,8 +22,9 @@ namespace Access.Data
             _options = options;
         }
 
-        //public DbSet<Student> Students { get; set; }
-        //public DbSet<Parent> Parents { get; set; }
+        public DbSet<Student> Students { get; set; }
+        public DbSet<Parent> Parents { get; set; }
+        public DbSet<ParentStudent> ParentStudent { get; set; }
         public DbSet<Campus> Campuses { get; set; }
         public DbSet<Grade> Grades { get; set; }
         public DbSet<JobTitle> JobTitles { get; set; }
@@ -40,6 +43,13 @@ namespace Access.Data
                     entityType.AddSoftDeleteQueryFilter();
                 }
             });
+
+
+            builder.Entity<Parent>()
+                    .HasMany(e => e.Students)
+                    .WithMany(e => e.Parents)
+                    .UsingEntity<ParentStudent>();
+
         }
 
         public async Task<bool> TrySaveChangesAsync()
