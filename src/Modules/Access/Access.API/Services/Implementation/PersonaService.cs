@@ -357,6 +357,15 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
+            var bus = await _dbContext.Buses.FirstOrDefaultAsync(x => x.Id == request.BusId);
+            if (bus is null)
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status400BadRequest;
+                response.Message = "Bus doesnt exist";
+                return response;
+            }
+
             if (!string.Equals(request.Password, request.ConfirmPassword))
             {
                 _logger.LogInformation("Password Field not the same as that of ConfirmPassword field");
