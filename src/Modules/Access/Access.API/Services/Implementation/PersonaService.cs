@@ -213,11 +213,11 @@ namespace Access.API.Services.Implementation
             if (sameEmailCount is not 0)
             {
                 emailExist = string.Concat(request.FirstName, request.LastName,$"{sameEmailCount++}","@","smsabuja", ".com");
-                user = new Persona() { Id = Guid.NewGuid(), FirstName = request.FirstName, LastName = request.LastName, Email = emailExist, UserName = string.Concat(request.FirstName," ", request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, EmailConfirmed = true };
+                user = new Persona() { Id = Guid.NewGuid(), FirstName = request.FirstName, LastName = request.LastName, Email = emailExist, UserName = string.Concat(request.FirstName, request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, EmailConfirmed = true };
             }
             else
             {
-                user = new Persona() { Id = Guid.NewGuid(), FirstName = request.FirstName, LastName = request.LastName, Email = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com"), UserName = string.Concat(request.FirstName," ",  request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, EmailConfirmed = true };
+                user = new Persona() { Id = Guid.NewGuid(), FirstName = request.FirstName, LastName = request.LastName, Email = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com"), UserName = string.Concat(request.FirstName,  request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, EmailConfirmed = true };
             }
 
             var creationResult = await _userManager.CreateAsync(user);
