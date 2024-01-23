@@ -23,12 +23,14 @@ namespace Access.API.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ConfigSPEController(IGradeService gradeService, ICampusService campusService,
         IJobTitleService jobTitleService,
-        IBusService busService) : BaseController
+        IBusService busService,
+        IDepartmentService departmentService) : BaseController
     {
         private readonly IGradeService _gradeService = gradeService;
         private readonly ICampusService _campusService = campusService;
         private readonly IJobTitleService _jobTitleService = jobTitleService;
         private readonly IBusService _busService = busService;
+        private readonly IDepartmentService _departmentService = departmentService;
 
         [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
         [SwaggerOperation(
@@ -231,6 +233,48 @@ namespace Access.API.Controllers
             return HandleResult(response);
         }
 
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [SwaggerOperation(
+          Summary = "Create a new Department Endpoint",
+          Description = "This endpoint creates a new Department. It requires Admin privilege",
+          OperationId = "Department.create",
+          Tags = new[] { "SPE-Configuration-Endpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPost("create-department")]
+        public async Task<ActionResult<BaseResponse>> CreateDepartmentAsync(CreateDepartmentRequest request)
+        {
+            var response = await _departmentService.CreateDepartment(request, User.Identity!.Name ?? string.Empty);
+            return HandleResult(response);
+        }
+
+
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [SwaggerOperation(
+        Summary = "Get List Of Departments Endpoint",
+        Description = "This endpoint gets the list of Departments. It requires Admin privilege",
+        OperationId = "departments.get",
+        Tags = new[] { "SPE-Configuration-Endpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<List<BusResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpGet("department-list")]
+        public async Task<ActionResult<ApiResponse<List<DepartmentResponse>>>> GetDepartmentsAsync()
+        {
+            var response = await _departmentService.GetAllAsync();
+            return HandleResult(response);
+        }
 
     }
 }
