@@ -144,48 +144,48 @@ namespace Access.API.Controllers
 
 
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
-        //[SwaggerOperation(
-        //Summary = "Create JobTitle Endpoint",
-        //Description = "This endpoint create a  JobTitle. It requires Admin privilege",
-        //OperationId = "jobTitle.post",
-        //Tags = new[] { "SPE-Configuration-Endpoints" })
-        //]
-        //[Produces(MediaTypeNames.Application.Json)]
-        //[ProducesResponseType(typeof(ApiResponse<List<JobTitleRespone>>), StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        //[HttpPost("create-jobTitle")]
-        //public async Task<ActionResult<BaseResponse>> CreateJobTitleAsync(CreateJobTitleRequest request )
-        //{
-        //    var response = await _jobTitleService.CreateJobTitle( request);
-        //    return HandleResult(response);
-        //}
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [SwaggerOperation(
+        Summary = "Create JobTitle Endpoint",
+        Description = "This endpoint create a  JobTitle. It requires Admin privilege",
+        OperationId = "jobTitle.post",
+        Tags = new[] { "SPE-Configuration-Endpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<List<JobTitleRespone>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPost("create-jobTitle")]
+        public async Task<ActionResult<BaseResponse>> CreateJobTitleAsync(CreateJobTitleRequest request)
+        {
+            var response = await _jobTitleService.CreateJobTitle(request);
+            return HandleResult(response);
+        }
 
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
-        //[SwaggerOperation(
-        //Summary = "Get List Of JobTitle Endpoint",
-        //Description = "This endpoint gets the list of JobTitle. It requires Admin privilege",
-        //OperationId = "jobTitle.get",
-        //Tags = new[] { "SPE-Configuration-Endpoints" })
-        //]
-        //[Produces(MediaTypeNames.Application.Json)]
-        //[ProducesResponseType(typeof(ApiResponse<List<JobTitleRespone>>), StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        //[HttpGet("jobTitle-list")]
-        //public async Task<ActionResult<ApiResponse<List<JobTitleRespone>>>> GetJobTitleAsync()
-        //{
-        //    var response = await _jobTitleService.GetAllAsync();
-        //    return HandleResult(response);
-        //}
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [SwaggerOperation(
+        Summary = "Get List Of JobTitle Endpoint",
+        Description = "This endpoint gets the list of JobTitle. It requires Admin privilege",
+        OperationId = "jobTitle.get",
+        Tags = new[] { "SPE-Configuration-Endpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<List<JobTitleRespone>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpGet("jobTitle-list")]
+        public async Task<ActionResult<ApiResponse<List<JobTitleRespone>>>> GetJobTitleAsync()
+        {
+            var response = await _jobTitleService.GetAllAsync();
+            return HandleResult(response);
+        }
 
 
         [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
@@ -231,48 +231,48 @@ namespace Access.API.Controllers
             return HandleResult(response);
         }
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
-        //[SwaggerOperation(
-        //  Summary = "Create a new Department Endpoint",
-        //  Description = "This endpoint creates a new Department. It requires Admin privilege",
-        //  OperationId = "Department.create",
-        //  Tags = new[] { "SPE-Configuration-Endpoints" })
-        //]
-        //[Produces(MediaTypeNames.Application.Json)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        //[HttpPost("create-department")]
-        //public async Task<ActionResult<BaseResponse>> CreateDepartmentAsync(CreateDepartmentRequest request)
-        //{
-        //    var response = await _departmentService.CreateDepartment(request, User.Identity!.Name ?? string.Empty);
-        //    return HandleResult(response);
-        //}
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [SwaggerOperation(
+          Summary = "Create a new Department Endpoint",
+          Description = "This endpoint creates a new Department. It requires Admin privilege",
+          OperationId = "Department.create",
+          Tags = new[] { "SPE-Configuration-Endpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPost("create-department")]
+        public async Task<ActionResult<BaseResponse>> CreateDepartmentAsync(CreateDepartmentRequest request)
+        {
+            var response = await _departmentService.CreateDepartment(request, User.Identity!.Name ?? string.Empty);
+            return HandleResult(response);
+        }
 
 
-        //[Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
-        //[SwaggerOperation(
-        //Summary = "Get List Of Departments Endpoint",
-        //Description = "This endpoint gets the list of Departments. It requires Admin privilege",
-        //OperationId = "departments.get",
-        //Tags = new[] { "SPE-Configuration-Endpoints" })
-        //]
-        //[Produces(MediaTypeNames.Application.Json)]
-        //[ProducesResponseType(typeof(ApiResponse<List<BusResponse>>), StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        //[HttpGet("department-list")]
-        //public async Task<ActionResult<ApiResponse<List<DepartmentResponse>>>> GetDepartmentsAsync()
-        //{
-        //    var response = await _departmentService.GetAllAsync();
-        //    return HandleResult(response);
-        //}
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [SwaggerOperation(
+        Summary = "Get List Of Departments Endpoint",
+        Description = "This endpoint gets the list of Departments. It requires Admin privilege",
+        OperationId = "departments.get",
+        Tags = new[] { "SPE-Configuration-Endpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<List<BusResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpGet("department-list")]
+        public async Task<ActionResult<ApiResponse<List<DepartmentResponse>>>> GetDepartmentsAsync()
+        {
+            var response = await _departmentService.GetAllAsync();
+            return HandleResult(response);
+        }
 
     }
 }
