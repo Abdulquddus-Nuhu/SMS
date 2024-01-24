@@ -109,11 +109,11 @@ try
             },
         });
 
-        d.SwaggerDoc("Access", new OpenApiInfo
+        d.SwaggerDoc("SPE Module", new OpenApiInfo
         {
-            Title = "Access Module",
+            Title = "SPE Module",
             Version = "v1",
-            Description = "Access Module",
+            Description = "SPE Module",
             Contact = new OpenApiContact
             {
                 Name = "Stella Maris Schools",
@@ -140,18 +140,6 @@ try
             }
         };
 
-        //c.SwaggerDoc("v1", new OpenApiInfo()
-        //{
-        //    Version = "v1",
-        //    Title = "MyStarTracker API",
-        //    Description = "REST API for MyStar Tracker @ Stella Maris Schools",
-        //    Contact = new OpenApiContact
-        //    {
-        //        Name = "Stella Maris Schools",
-        //        Email = "dev.nuhu@smsbuja.com",
-        //        //Url = new Uri("https://sms.ng")
-        //    },
-        //});
         c.EnableAnnotations();
         c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
         c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -215,7 +203,7 @@ try
         app.UseSwaggerUI(c =>
         {
             c.SwaggerEndpoint($"/swagger/API-Host/swagger.json", "API-Host");
-            c.SwaggerEndpoint($"/swagger/Access/swagger.json", "Access");
+            c.SwaggerEndpoint($"/swagger/SPE Module/swagger.json", "SPE Module");
         });
     }
 
