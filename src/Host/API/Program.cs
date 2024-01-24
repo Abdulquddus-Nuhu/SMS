@@ -100,12 +100,13 @@ try
         d.SwaggerDoc("API-Host", new OpenApiInfo()
         {
             Version = "v1",
-            Title = "MyStarApp API",
-            Description = "REST API for MyStar App @ Stella Maris Schools",
+            Title = "MyStarAPI",
+            Description = "REST API for MyStar App - Stella Maris Schools",
             Contact = new OpenApiContact
             {
                 Name = "Stella Maris Schools",
                 Email = "dev.nuhu@smsbuja.com",
+                //Url = new Uri("https://sms.ng")
             },
         });
 
@@ -113,11 +114,12 @@ try
         {
             Title = "SPE Module",
             Version = "v1",
-            Description = "SPE Module",
+            Description = "SPE Module APIs",
             Contact = new OpenApiContact
             {
                 Name = "Stella Maris Schools",
                 Email = "dev.nuhu@smsbuja.com",
+                //Url = new Uri("https://sms.ng")
             },
         });
     });
