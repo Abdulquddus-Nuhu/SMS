@@ -16,7 +16,7 @@ using System.Net.Mime;
 
 namespace Access.API.Controllers
 {
-    [ApiExplorerSettings(GroupName = "Access")]
+    [ApiExplorerSettings(GroupName = "SPE Module")]
     //[Route("api/[controller]")]
     [Route("api/")]
     [ApiController]

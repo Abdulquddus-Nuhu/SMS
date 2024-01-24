@@ -12,7 +12,7 @@ using System.Net.Mime;
 
 namespace Access.API.Controllers
 {
-    [ApiExplorerSettings(GroupName = "Access")]
+    [ApiExplorerSettings(GroupName = "SPE Module")]
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
