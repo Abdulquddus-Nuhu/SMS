@@ -751,6 +751,18 @@ namespace Access.API.Services.Implementation
             return response;
         }
 
+        public async Task<ApiResponse<List<PersonaResponse>>> GetUsersWithRole()
+        {
+            var response = new ApiResponse<List<PersonaResponse>>();
+
+            response.Data = await (from user in _dbContext.Users
+                                 join userRoles in _dbContext.UserRoles on user.Id equals userRoles.UserId
+                                 join role in _dbContext.Roles on userRoles.RoleId equals role.Id
+                                 select new PersonaResponse { Id = user.Id, UserName = user.UserName, Email = user.Email, Role = role.Name })
+                            .ToListAsync();
+
+            return response;
+        }
 
         private string UploadPhoto(IFormFile? photo, string folder, string fileNameAlias)
         {

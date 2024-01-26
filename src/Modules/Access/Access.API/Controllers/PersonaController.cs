@@ -1,4 +1,5 @@
 ﻿using Access.API.Models.Requests;
+using Access.API.Models.Responses;
 using Access.API.Services.Interfaces;
 using Access.Models.Requests;
 using Access.Models.Responses;
@@ -369,6 +370,27 @@ namespace Access.API.Controllers
         public async Task<ActionResult<ApiResponse<StudentResponse>>> GetStudentAsync(Guid studentId)
         {
             var response = await _personaService.GetStudentAsync(studentId);
+            return HandleResult(response);
+        }
+
+        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [SwaggerOperation(
+        Summary = "Get List Of Users Endpoint",
+        Description = "This endpoint gets the list of Users . It requires Admin privilege",
+        OperationId = "personas.get",
+        Tags = new[] { "PersonaEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<List<PersonaResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpGet("users")]
+        public async Task<ActionResult<ApiResponse<List<PersonaResponse>>>> GetUsersWithRoleAsync()
+        {
+            var response = await _personaService.GetUsersWithRole();
             return HandleResult(response);
         }
 
