@@ -1,4 +1,5 @@
 ﻿using Access.API.Models.Requests;
+using Access.API.Models.Responses;
 using Access.Models.Requests;
 using Access.Models.Responses;
 using Shared.Models.Responses;
@@ -23,6 +24,8 @@ namespace Access.API.Services.Interfaces
         public Task<ApiResponse<List<BusDriverResponse>>> BusDriverListAsync();
 
         public Task<ApiResponse<StudentResponse>> EditStudentAsync(Guid studentId, EditStudentRequest request, string editor);
+
+        public Task<ApiResponse<List<PersonaResponse>>> GetUsersWithRole();
 
 
     }
