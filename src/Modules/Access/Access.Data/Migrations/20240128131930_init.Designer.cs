@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Access.Data.Migrations
 {
     [DbContext(typeof(AccessDbContext))]
-    [Migration("20240128125417_modifyParentStudent")]
-    partial class modifyParentStudent
+    [Migration("20240128131930_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
