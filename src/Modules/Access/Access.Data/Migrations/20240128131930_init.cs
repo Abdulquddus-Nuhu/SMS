@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Access.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -432,12 +432,20 @@ namespace Access.Data.Migrations
                 name: "ParentStudent",
                 columns: table => new
                 {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ParentsId = table.Column<Guid>(type: "uuid", nullable: false),
-                    StudentsId = table.Column<Guid>(type: "uuid", nullable: false)
+                    StudentsId = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedBy = table.Column<string>(type: "text", nullable: true),
+                    Deleted = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Modified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ParentStudent", x => new { x.ParentsId, x.StudentsId });
+                    table.PrimaryKey("PK_ParentStudent", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ParentStudent_Parents_ParentsId",
                         column: x => x.ParentsId,
@@ -538,6 +546,16 @@ namespace Access.Data.Migrations
                 name: "IX_Parents_IsDeleted",
                 table: "Parents",
                 column: "IsDeleted");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ParentStudent_IsDeleted",
+                table: "ParentStudent",
+                column: "IsDeleted");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ParentStudent_ParentsId",
+                table: "ParentStudent",
+                column: "ParentsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ParentStudent_StudentsId",
