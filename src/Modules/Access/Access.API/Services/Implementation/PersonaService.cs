@@ -534,12 +534,6 @@ namespace Access.API.Services.Implementation
                 })
                 .AsNoTracking()
                 .ToListAsync();
-
-            //foreach (var parent in parents)
-            //{
-            //    parent.NumberOfStudent = _dbContext.Students.Where(x => x.ParentId == parent.ParentId && x.IsDeleted == false).Count();
-
-            //}
             
             foreach (var parent in parents)
             {
@@ -708,6 +702,12 @@ namespace Access.API.Services.Implementation
             }
 
             student.Delete(deletor);
+            var studentParent = await _dbContext.ParentStudent.FirstOrDefaultAsync(x => x.StudentsId == studentId); 
+            if (studentParent is null)
+            {
+                _logger.LogInformation("parent-student entity doesnt exist");
+            }
+            studentParent.IsDeleted = true;
 
             if (!(await _dbContext.TrySaveChangesAsync()))
             {
