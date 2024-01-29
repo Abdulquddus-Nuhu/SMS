@@ -91,6 +91,16 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
+            if (user.IsActive is true)
+            {
+                _logger.LogWarning("Login with email {0} was deleted not active in the userManager store after a successfull Sign in", request.Email);
+
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Status = false;
+                response.Message = $"Account not found for {request.Email}!";
+                return response;
+            }
+
             var userRoles = await _userManager.GetRolesAsync(user);
 
             response.Data.FullName = user.FullName;
