@@ -761,7 +761,7 @@ namespace Access.API.Services.Implementation
             response.Data = await (from user in _dbContext.Users
                                  join userRoles in _dbContext.UserRoles on user.Id equals userRoles.UserId
                                  join role in _dbContext.Roles on userRoles.RoleId equals role.Id
-                                 select new PersonaResponse { Id = user.Id, UserName = user.UserName, Email = user.Email, Role = role.Name })
+                                 select new PersonaResponse { Id = user.Id, UserName = user.UserName,FirstName = user.FirstName, LastName = user.LastName, Email = user.Email, Role = role.Name })
                             .ToListAsync();
 
             return response;
