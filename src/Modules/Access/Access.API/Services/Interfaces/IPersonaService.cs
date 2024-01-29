@@ -26,7 +26,6 @@ namespace Access.API.Services.Interfaces
         public Task<ApiResponse<StudentResponse>> EditStudentAsync(Guid studentId, EditStudentRequest request, string editor);
 
         public Task<ApiResponse<List<PersonaResponse>>> GetUsersWithRole();
-
-
+        public Task<BaseResponse> DeletePersonaAccountAsync(string email);
     }
 }

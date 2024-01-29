@@ -709,6 +709,7 @@ namespace Access.API.Services.Implementation
             }
             studentParent.IsDeleted = true;
 
+
             if (!(await _dbContext.TrySaveChangesAsync()))
             {
                 response.Code = ResponseCodes.Status500InternalServerError;
@@ -718,6 +719,8 @@ namespace Access.API.Services.Implementation
             }
 
             var persona = await _userManager.FindByIdAsync(student.PersonaId.ToString());
+            persona.Delete(deletor);
+
             await _userManager.SetLockoutEnabledAsync(persona, true);
             await _userManager.SetLockoutEndDateAsync(persona, DateTimeOffset.MaxValue);
             await _userManager.UpdateAsync(persona);
@@ -758,11 +761,91 @@ namespace Access.API.Services.Implementation
             response.Data = await (from user in _dbContext.Users
                                  join userRoles in _dbContext.UserRoles on user.Id equals userRoles.UserId
                                  join role in _dbContext.Roles on userRoles.RoleId equals role.Id
-                                 select new PersonaResponse { Id = user.Id, UserName = user.UserName, Email = user.Email, Role = role.Name })
+                                 select new PersonaResponse { Id = user.Id, UserName = user.UserName,FirstName = user.FirstName, LastName = user.LastName, Email = user.Email, Role = role.Name })
                             .ToListAsync();
 
             return response;
         }
+
+        public async Task<BaseResponse> DeletePersonaAccountAsync(string email)
+        {
+            _logger.LogInformation("Trying to delete a user account with email: {0}", email);
+            var response = new BaseResponse();
+
+            var persona = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
+            if (persona is null)
+            {
+                _logger.LogInformation("User with email: {0} not found", email);
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Message = "User not found";
+                response.Status = false;
+                return response;
+            }
+
+            persona.IsActive = false;
+            persona.Delete(email);
+
+            switch (persona.PesonaType)
+            {
+                case PersonaType.Admin:
+                    break;
+
+                case PersonaType.Parent:
+                    var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.PersonaId == persona.Id); 
+                    if (parent is null)
+                    {
+                        //Todo:later
+                    }
+                    parent.Delete(persona.Email);
+                    break;
+
+                case PersonaType.Student:
+                    var student = await _dbContext.Students.FirstOrDefaultAsync(x => x.PersonaId == persona.Id);
+                    if (student is null)
+                    {
+                        //Todo:later
+                    }
+                    student.Delete(persona.Email);
+                    break;
+
+                case PersonaType.BusDriver:
+                    var busDriver = await _dbContext.Busdrivers.FirstOrDefaultAsync(x => x.PersonaId == persona.Id);
+                    if (busDriver is null)
+                    {
+                        //Todo:later
+                    }
+                    busDriver.Delete(persona.Email);
+                    break;
+
+                case PersonaType.Staff:
+                    var staff = await _dbContext.Staffs.FirstOrDefaultAsync(x => x.PersonaId == persona.Id);
+                    if (staff is null)
+                    {
+                        //Todo:later
+                    }
+                    staff.Delete(persona.Email);
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (!(await _dbContext.TrySaveChangesAsync()))
+            {
+                response.Code = ResponseCodes.Status500InternalServerError;
+                response.Status = false;
+                response.Message = "Unable to delete user account! Please try again";
+                return response;
+            }
+
+            //var persona = await _userManager.FindByIdAsync(persona.PersonaId.ToString());
+            //await _userManager.SetLockoutEnabledAsync(persona, true);
+            //await _userManager.SetLockoutEndDateAsync(persona, DateTimeOffset.MaxValue);
+            //await _userManager.UpdateAsync(persona);
+
+            return response;
+        }
+
 
         private string UploadPhoto(IFormFile? photo, string folder, string fileNameAlias)
         {

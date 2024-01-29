@@ -394,6 +394,26 @@ namespace Access.API.Controllers
             return HandleResult(response);
         }
 
+        [AllowAnonymous]
+        [SwaggerOperation(
+        Summary = "Delete A User Account Endpoint",
+        Description = "This endpoint deletes a user account.",
+        OperationId = "personaAccount.delete",
+        Tags = new[] { "PersonaEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpDelete("delete-account")]
+        public async Task<ActionResult<BaseResponse>> DeletePersonaAccountAsync(string email)
+        {
+            var response = await _personaService.DeletePersonaAccountAsync(email);
+            return HandleResult(response);
+        }
 
     }
 
