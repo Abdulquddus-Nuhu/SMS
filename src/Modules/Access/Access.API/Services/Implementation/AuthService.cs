@@ -91,7 +91,7 @@ namespace Access.API.Services.Implementation
                 return response;
             }
 
-            if (user.IsActive is true)
+            if (user.IsActive is false)
             {
                 _logger.LogWarning("Login with email {0} was deleted not active in the userManager store after a successfull Sign in", request.Email);
 
