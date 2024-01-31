@@ -791,40 +791,40 @@ namespace Access.API.Services.Implementation
                     break;
 
                 case PersonaType.Parent:
-                    var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.PersonaId == persona.Id); 
-                    if (parent is null)
                     {
-                        //Todo:later
+                        var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.PersonaId == persona.Id);
+                        if (parent is null) break;
+
+                        parent.Delete(persona.Email);
+                        break;
                     }
-                    parent.Delete(persona.Email);
-                    break;
 
                 case PersonaType.Student:
-                    var student = await _dbContext.Students.FirstOrDefaultAsync(x => x.PersonaId == persona.Id);
-                    if (student is null)
                     {
-                        //Todo:later
+                        var student = await _dbContext.Students.FirstOrDefaultAsync(x => x.PersonaId == persona.Id);
+                        if (student is null) break;
+
+                        student.Delete(persona.Email);
+                        break;
                     }
-                    student.Delete(persona.Email);
-                    break;
 
                 case PersonaType.BusDriver:
-                    var busDriver = await _dbContext.Busdrivers.FirstOrDefaultAsync(x => x.PersonaId == persona.Id);
-                    if (busDriver is null)
                     {
-                        //Todo:later
-                    }
-                    busDriver.Delete(persona.Email);
-                    break;
+                        var busDriver = await _dbContext.Busdrivers.FirstOrDefaultAsync(x => x.PersonaId == persona.Id);
+                        if (busDriver is null) break;
 
-                case PersonaType.Staff:
-                    var staff = await _dbContext.Staffs.FirstOrDefaultAsync(x => x.PersonaId == persona.Id);
-                    if (staff is null)
-                    {
-                        //Todo:later
+                        busDriver.Delete(persona.Email);
+                        break;
                     }
-                    staff.Delete(persona.Email);
-                    break;
+                   
+                case PersonaType.Staff:
+                    {
+                        var staff = await _dbContext.Staffs.FirstOrDefaultAsync(x => x.PersonaId == persona.Id);
+                        if (staff is null) break;
+
+                        staff.Delete(persona.Email);
+                        break;
+                    }
 
                 default:
                     break;
