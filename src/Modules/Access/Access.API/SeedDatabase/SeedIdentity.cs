@@ -33,25 +33,27 @@ namespace Access.API.SeedDatabase
                 }
             }
             
-            var itHeadEmail = Environment.GetEnvironmentVariable("IT_HEAD_EMAIL") ?? DefaultValues.IT_HEAD_EMAIL;
-            if (await userManager.FindByEmailAsync(itHeadEmail) is null)
+            //ADMIN
+            var SMSAdmin = Environment.GetEnvironmentVariable("SMS_ADMIN_EMAIL") ?? DefaultValues.SMS_ADMIN_EMAIL;
+            if (await userManager.FindByEmailAsync(SMSAdmin) is null)
             {
-                var superAdmin = new Persona()
+                var admin = new Persona()
                 {
-                    Email = itHeadEmail,
-                    FirstName = "SuperAdmin",
-                    LastName = "IT-Head-Emma",
-                    PhoneNumber = Environment.GetEnvironmentVariable("IT_HEAD_PHONENUMBER") ?? DefaultValues.IT_HEAD_PHONENUMBER,
-                    UserName = itHeadEmail,
+                    Email = SMSAdmin,
+                    FirstName = "SMS",
+                    LastName = "Admin",
+                    PhoneNumber = Environment.GetEnvironmentVariable("SMS_ADMIN_PHONENUMBER") ?? DefaultValues.SMS_ADMIN_PHONENUMBER,
+                    UserName = SMSAdmin,
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
                 };
-                var result = await userManager.CreateAsync(superAdmin, Environment.GetEnvironmentVariable("IT_HEAD_PASSWORD") ?? DefaultValues.IT_HEAD_PASSWORD);
+                var result = await userManager.CreateAsync(admin, Environment.GetEnvironmentVariable("SMS_ADMIN_PASSWORD") ?? DefaultValues.SMS_ADMIN_PASSWORD);
                 if (result.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(superAdmin, Roles.SUPER_ADMIN);
+                    await userManager.AddToRoleAsync(admin, Roles.ADMIN);
                 }
             }
+
         }
         private static async Task SeedRoles(RoleManager<Role> roleManager)
         {

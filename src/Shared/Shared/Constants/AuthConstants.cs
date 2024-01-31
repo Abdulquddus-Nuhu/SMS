@@ -20,7 +20,7 @@ namespace Shared.Constants
         public static class Policies
         {
             public const string ROOTS = "Root Accounts";
-            public const string CUSTODIANS = "Admin Accounts";
+            public const string ADMINS = "Admin Accounts";
         }
         #endregion
     }
