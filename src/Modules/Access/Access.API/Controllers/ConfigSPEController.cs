@@ -1,12 +1,8 @@
 ﻿using Access.API.Models.Requests;
 using Access.API.Models.Responses;
-using Access.API.Services.Implementation;
 using Access.API.Services.Interfaces;
-using Access.Models.Requests;
-using Access.Models.Responses;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Constants;
 using Shared.Controllers;

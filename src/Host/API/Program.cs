@@ -7,9 +7,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using Serilog.Core;
 using Serilog.Events;
-using Shared.Constants;
 
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
