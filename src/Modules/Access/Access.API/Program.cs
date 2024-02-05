@@ -99,7 +99,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy(AuthConstants.Policies.CUSTODIANS, policy =>
+    options.AddPolicy(AuthConstants.Policies.ADMINS, policy =>
     {
         policy.RequireRole(AuthConstants.Roles.ADMIN, AuthConstants.Roles.SUPER_ADMIN);
         policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);

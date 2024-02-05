@@ -3,7 +3,6 @@ using Access.Models.Requests;
 using Access.Models.Responses;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Controllers;
 using Shared.Models.Responses;

@@ -1,12 +1,8 @@
 ﻿using Access.API.Models.Requests;
 using Access.API.Models.Responses;
-using Access.API.Services.Implementation;
 using Access.API.Services.Interfaces;
-using Access.Models.Requests;
-using Access.Models.Responses;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Constants;
 using Shared.Controllers;
@@ -32,7 +28,7 @@ namespace Access.API.Controllers
         private readonly IBusService _busService = busService;
         private readonly IDepartmentService _departmentService = departmentService;
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
               Summary = "Create a new Campus Endpoint",
               Description = "This endpoint creates a new campus. It requires Admin privilege",
@@ -54,7 +50,7 @@ namespace Access.API.Controllers
         }
 
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
         Summary = "Get List Of Campus Endpoint",
         Description = "This endpoint gets the list of campus. It requires Admin privilege",
@@ -76,7 +72,7 @@ namespace Access.API.Controllers
         }
 
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
         Summary = "Get List Of Campus Including Grades Endpoint",
         Description = "This endpoint gets the list of campus including the grades associated with the campus. It requires Admin privilege",
@@ -99,7 +95,7 @@ namespace Access.API.Controllers
 
 
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
               Summary = "Create a new Grade Endpoint",
               Description = "This endpoint creates a new grade. It requires Admin privilege",
@@ -121,7 +117,7 @@ namespace Access.API.Controllers
         }
 
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
         Summary = "Get List Of Grade Endpoint",
         Description = "This endpoint gets the list of grade. It requires Admin privilege",
@@ -144,7 +140,7 @@ namespace Access.API.Controllers
 
 
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
         Summary = "Create JobTitle Endpoint",
         Description = "This endpoint create a  JobTitle. It requires Admin privilege",
@@ -166,7 +162,7 @@ namespace Access.API.Controllers
         }
 
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
         Summary = "Get List Of JobTitle Endpoint",
         Description = "This endpoint gets the list of JobTitle. It requires Admin privilege",
@@ -188,7 +184,7 @@ namespace Access.API.Controllers
         }
 
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
           Summary = "Create a new Bus Endpoint",
           Description = "This endpoint creates a new bus. It requires Admin privilege",
@@ -210,7 +206,7 @@ namespace Access.API.Controllers
         }
 
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
         Summary = "Get List Of Bus Endpoint",
         Description = "This endpoint gets the list of bus. It requires Admin privilege",
@@ -231,7 +227,7 @@ namespace Access.API.Controllers
             return HandleResult(response);
         }
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
           Summary = "Create a new Department Endpoint",
           Description = "This endpoint creates a new Department. It requires Admin privilege",
@@ -253,7 +249,7 @@ namespace Access.API.Controllers
         }
 
 
-        [Authorize(Policy = AuthConstants.Policies.CUSTODIANS)]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
         Summary = "Get List Of Departments Endpoint",
         Description = "This endpoint gets the list of Departments. It requires Admin privilege",

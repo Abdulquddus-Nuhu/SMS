@@ -101,7 +101,7 @@ namespace Access.API.Extensions
 
             builder.Services.AddAuthorization(options =>
             {
-                options.AddPolicy(AuthConstants.Policies.CUSTODIANS, policy => policy.RequireRole(AuthConstants.Roles.ADMIN, AuthConstants.Roles.SUPER_ADMIN));
+                options.AddPolicy(AuthConstants.Policies.ADMINS, policy => policy.RequireRole(AuthConstants.Roles.ADMIN, AuthConstants.Roles.SUPER_ADMIN));
             });
 
             // Register the worker responsible of seeding the database.
