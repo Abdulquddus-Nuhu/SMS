@@ -53,7 +53,7 @@ namespace API.Controllers.SPE
         [Authorize(Roles = AuthConstants.Roles.SUPER_ADMIN + ", " + AuthConstants.Roles.PARENT)]
         [SwaggerOperation(
         Summary = "Authorizes a QrCode By Parent Endpoint",
-        Description = "This endpoint authorizes a qrCode. It requires Parent privilege",
+        Description = "This endpoint authorizes a qrCode. For AuthorizedUser :- Self = 0, Other = 1. It requires Parent privilege",
         OperationId = "qrCode.edit",
         Tags = new[] { "QrCodeEndpoints" })
         ]

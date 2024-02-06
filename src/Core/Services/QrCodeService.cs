@@ -77,8 +77,7 @@ namespace Core.Services
 
             // Update the QrCode properties
             qrCode.AuthorizedUser = request.AuthorizedUser;
-            qrCode.AuthorizedUserFirstName = request.AuthorizedUserFirstName;
-            qrCode.AuthorizedUserFirstName = request.AuthorizedUserLastName;
+            qrCode.AuthorizedUserFullName = request.AuthorizedUserFullName;
             qrCode.AuthorizedUserRelationship = request.AuthorizedUserRelationship;
 
             var result = await _qrCodeRepository.EditQrCode(qrCode);
