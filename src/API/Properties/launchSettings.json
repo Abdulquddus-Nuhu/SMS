@@ -40,9 +40,9 @@
         "ROOT_ADMIN_EMAIL": "dev.nuhu@smsabuja.com",
         "ROOT_ADMIN_PHONENUMBER": "08038441300",
         "ROOT_DEFAULT_PASSWORD": "DefaultPass#123",
-        "IT_HEAD_EMAIL": "it@smsabuja.com",
-        "IT_HEAD_PHONENUMBER": "08060216275",
-        "IT_HEAD_PASSWORD": "DefaultPass@1234",
+        "SMS_ADMIN_EMAIL": "it@smsabuja.com",
+        "SMS_ADMIN_PHONENUMBER": "08060216275",
+        "SMS_ADMIN_PASSWORD": "DefaultPass@1234",
         "JWT_SECRET_KEY": "SampleKey&392929SampleKey&392929SampleKey&392929"
       },
       "dotnetRunMessages": true
