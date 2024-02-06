@@ -4,6 +4,7 @@
 
 namespace API.Controllers.HR
 {
+    [ApiExplorerSettings(GroupName = "HR Module")]
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase
