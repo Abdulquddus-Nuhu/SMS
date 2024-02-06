@@ -10,7 +10,7 @@ using Shared.Models.Responses;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Mime;
 
-namespace Access.API.Controllers
+namespace API.Controllers.SPE
 {
     [ApiExplorerSettings(GroupName = "SPE Module")]
     //[Route("api/[controller]")]

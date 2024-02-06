@@ -31,9 +31,28 @@ namespace Core.Services
             };
         }
         
+        public async Task<ApiResponse<List<StudentWithQrCodeResponse>>> GetParentStudentsAsync(string email)
+        {
+            var data = await _qrCodeRepository.GetParentStudentsAsync(email);
+
+            return new ApiResponse<List<StudentWithQrCodeResponse>>()
+            {
+                Data = data
+            };
+        }
+        
         public async Task<ApiResponse<GenerateQrCodeResponse>> CreateQrCodeAsync(GenerateQrCodeRequest request)
         {
             var response = new ApiResponse<GenerateQrCodeResponse>();
+
+            var qrCodeExist = await _qrCodeRepository.QrCodeExist(request.StudentId, request.UserEmail);
+            if (qrCodeExist.Status)
+            {
+                response.Status = qrCodeExist.Status;
+                response.Message = qrCodeExist.Message;
+                response.Code = ResponseCodes.Status400BadRequest;
+                return response;
+            }
 
             var newQrCode = new QrCode()
             {

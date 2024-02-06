@@ -70,5 +70,26 @@ namespace API.Controllers.SPE
             var response = await _qrCodeService.AuthorizeQrCode(request);
             return HandleResult(response);
         }
+
+        [Authorize(Roles = AuthConstants.Roles.SUPER_ADMIN + ", " + AuthConstants.Roles.PARENT)]
+        [SwaggerOperation(
+         Summary = "Get List Of Students And QrCode Status For the Day For A Parent Dashboard Endpoint",
+         Description = "It requires Parent privilege",
+         OperationId = "childrenQrcode.get",
+         Tags = new[] { "QrCodeEndpoints" })
+         ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<List<StudentWithQrCodeResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpGet("students")]
+        public async Task<ActionResult<ApiResponse<List<StudentWithQrCodeResponse>>>> GetParentStudentsAsync()
+        {
+            var response = await _qrCodeService.GetParentStudentsAsync(User.Identity!.Name ?? string.Empty);
+            return HandleResult(response);
+        }
     }
 }
