@@ -311,7 +311,7 @@ try
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {
-            c.SwaggerEndpoint($"/swagger/API-Host/swagger.json", "API-Host");
+            //c.SwaggerEndpoint($"/swagger/API-Host/swagger.json", "API-Host");
             c.SwaggerEndpoint($"/swagger/SPE Module/swagger.json", "SPE Module");
         });
     }
