@@ -13,5 +13,7 @@ namespace Core.Interfaces.Repositories
         public Task<BaseResponse> AddQrCode(QrCode qrCode);
         public Task<IQueryable<QrCode>> GetAllAsync();
         public Task<List<StudentInSchoolResponse>> GetTodaysQrCodeAsync(string email);
+        public Task<QrCode?> GetQrCodeById(Guid id);
+        public Task<BaseResponse> EditQrCode(QrCode qrCode);
     }
 }

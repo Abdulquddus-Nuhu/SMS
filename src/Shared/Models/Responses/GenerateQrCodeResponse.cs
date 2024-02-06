@@ -8,6 +8,7 @@ namespace Shared.Models.Responses
 {
     public record GenerateQrCodeResponse
     {
+        public Guid QrCodeId { get; set; }
         public string QrCodeData { get; set; } = string.Empty;
     }
 }
