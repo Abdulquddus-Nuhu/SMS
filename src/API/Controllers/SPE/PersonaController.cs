@@ -119,7 +119,7 @@ namespace Access.API.Controllers
             return HandleResult(response);
         }
 
-        [Authorize(Roles = AuthConstants.Roles.SUPER_ADMIN)]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
         Summary = "Get List Of Parents Endpoint",
         Description = "This endpoint gets the list of parents . It requires Admin privilege",
@@ -202,13 +202,6 @@ namespace Access.API.Controllers
             var response = await _personaService.StaffListAsync();
             return HandleResult(response);
         }
-
-        //for edit student edpoint 
-
-
-
-
-
 
 
         [Authorize(Policy = AuthConstants.Policies.ADMINS)]
@@ -318,13 +311,6 @@ namespace Access.API.Controllers
             var response = await _personaService.EditParentAsync(parentId, request, User.Identity!.Name ?? string.Empty);
             return HandleResult(response);
         }
-
-
-
-
-
-
-
 
 
         [Authorize(Policy = AuthConstants.Policies.ADMINS)]
