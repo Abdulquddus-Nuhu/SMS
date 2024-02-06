@@ -23,5 +23,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Modules\Access\Access.API\Access.API.csproj" />
+    <ProjectReference Include="..\..\Sharedd\Sharedd\Sharedd.csproj" />
   </ItemGroup>
 </Project>

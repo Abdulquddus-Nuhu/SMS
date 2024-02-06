@@ -32,6 +32,7 @@ namespace Access.Data
         public DbSet<JobTitle> JobTitles { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Bus> Buses { get; set; }
+        public DbSet<QrCode> QrCodes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Sharedd\Sharedd\Sharedd.csproj" />
-    <ProjectReference Include="..\..\..\Shared\Shared\Sharedd.csproj" />
     <ProjectReference Include="..\Access.Core\Access.Core.csproj" />
   </ItemGroup>
 
