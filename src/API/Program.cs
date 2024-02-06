@@ -121,26 +121,40 @@ try
 
 
     //Repositories
+    builder.Services.AddTransient<IBusRepository, BusRepository>();
     builder.Services.AddTransient<ICampusRepository, CampusRepository>();
     builder.Services.AddTransient<IGradeRepository, GradeRepository>();
-    builder.Services.AddTransient<IJobTitleRepository, JobTitleRepository>();
-    builder.Services.AddTransient<IBusRepository, BusRepository>();
     builder.Services.AddTransient<IDepartmentRepository, DepartmentRepository>();
+    builder.Services.AddTransient<IJobTitleRepository, JobTitleRepository>();
+    builder.Services.AddTransient<IQrCodeRepository, QrCodeRepository>();
 
 
     //Services
-    builder.Services.Scan(scan => scan.FromAssemblyOf<IAuthService>()
-     .AddClasses(classes => classes.InNamespaceOf<AuthService>())
-     .AsImplementedInterfaces()
-     .WithTransientLifetime());
+    builder.Services.AddTransient<IAuthService, AuthService>();
+    builder.Services.AddTransient<IPersonaService, PersonaService>();
+    builder.Services.AddTransient<ITokenService, TokenService>();
+    builder.Services.AddTransient<IBusService, BusService>();
+    builder.Services.AddTransient<ICampusService, CampusService>();
+    builder.Services.AddTransient<IGradeService, GradeService>();
+    builder.Services.AddTransient<IDepartmentService, DepartmentService>();
+    builder.Services.AddTransient<IJobTitleService, JobTitleService>();
+    builder.Services.AddTransient<IQrCodeService, QrCodeService>();
+
+
+    //Services
+    //builder.Services.Scan(scan => scan.FromAssemblyOf<IAuthService>()
+    // .AddClasses(classes => classes.InNamespaceOf<AuthService>())
+    // .AsImplementedInterfaces()
+    // .WithTransientLifetime());
 
 
     //Infrastructure 
-    builder.Services.Scan(scan => scan.FromAssemblyOf<IOtpGenerator>()
-     .AddClasses(classes => classes.InNamespaceOf<OtpGenerator>())
-     .AsImplementedInterfaces()
-     .WithTransientLifetime());
+    //builder.Services.Scan(scan => scan.FromAssemblyOf<IOtpGenerator>()
+    // .AddClasses(classes => classes.InNamespaceOf<OtpGenerator>())
+    // .AsImplementedInterfaces()
+    // .WithTransientLifetime());
 
+    builder.Services.AddTransient<IOtpGenerator, OtpGenerator>();
 
 
     var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ?? DefaultValues.JWT_SECRET_KEY);

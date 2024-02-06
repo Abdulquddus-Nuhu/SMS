@@ -8,7 +8,8 @@ namespace Core.Entities
         /// <summary>
         /// Parent-Id or BusDriver-Id or Staff-Id
         /// </summary>
-        public Guid UserId { get; set; }
+        //public Guid UserId { get; set; }
+        public string UserEmail { get; set; }
         public Guid StudentId { get; set; }
         public Student? Student { get; set; }
         public bool InSchool { get; set; } = true;

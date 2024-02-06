@@ -1,7 +1,9 @@
 ﻿using Core.Entities;
+using Core.Entities.Users;
 using Core.Interfaces.Repositories;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Models.Responses;
 using Shared.Models.Responses;
 using static Shared.Constants.StringConstants;
 
@@ -40,9 +42,51 @@ namespace Infrastructure.Repositories
             return _dbContext.QrCodes.AsQueryable().AsNoTracking();
         }
         
-        public async Task<IQueryable<QrCode>> GetTodaysQrCodeAsync()
+        public async Task<List<StudentInSchoolResponse>> GetTodaysQrCodeAsync(string email)
         {
-            return _dbContext.QrCodes.Include(x => x.Student).AsQueryable().AsNoTracking();
+            var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Email == email);
+
+            var studentIds = await _dbContext.ParentStudent
+                .Where(x => x.ParentsId == parent.Id)
+                .Select(x => x.StudentsId)
+                .ToListAsync();
+
+            var students = await _dbContext.Students
+                .Include(x => x.Grade)
+                .Where(x => studentIds.Contains(x.Id))
+                .Select(x => new StudentInSchoolResponse()
+                {
+                    StudentId = x.Id,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    PhotoUrl = x.PhotoUrl,
+                    Grade = x.Grade.Name,
+                })
+                .ToListAsync();
+
+            foreach ( var student in students )
+            {
+                //if (await _dbContext.QrCodes.AnyAsync( x => x.StudentId == student.StudentId && x.Created !=))
+                //{
+
+                //}
+
+                // Get the current date without the time component
+                DateTime currentDate = DateTime.Today.ToUniversalTime();
+                // Get the QR code for the student that matches the current date
+                var qrCode = await _dbContext.QrCodes.Where(x => x.StudentId == student.StudentId && x.Created.Date.ToUniversalTime() == currentDate).FirstOrDefaultAsync();
+                if (qrCode != null)
+                {
+                    // Do something with the QR code
+                    student.IsInSchool = true;
+                }
+                else
+                {
+                    student.IsInSchool = false;
+                }
+            }
+
+            return students;
         }
     }
 }

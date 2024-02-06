@@ -1,29 +1,26 @@
-﻿using Core.Interfaces.Repositories;
-using Core.Interfaces.Services;
+﻿using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models.Requests;
-using Models.Responses;
 using Shared.Constants;
 using Shared.Controllers;
 using Shared.Models.Responses;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Mime;
 
-namespace Access.API.Controllers
+namespace API.Controllers.SPE
 {
     [ApiExplorerSettings(GroupName = "SPE Module")]
-    //[Route("api/[controller]")]
-    [Route("api/dashboard")]
+    [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class DashboardController : BaseController
+    public class QrCodeController : BaseController
     {
         private readonly IQrCodeService _qrCodeService;
 
-        public DashboardController(IQrCodeService qrCodeService)
+        public QrCodeController(IQrCodeService qrCodeService)
         {
             _qrCodeService = qrCodeService;
         }
@@ -31,24 +28,25 @@ namespace Access.API.Controllers
 
         [Authorize(Roles = AuthConstants.Roles.SUPER_ADMIN + ", " + AuthConstants.Roles.PARENT)]
         [SwaggerOperation(
-        Summary = "Get List Of Students For A Parent Dashboard Endpoint",
-        Description = "This endpoint gets the list of students for a Parent to be displayed in dashboard. It requires Parent privilege",
-        OperationId = "parentDashboard.get",
-        Tags = new[] { "DashboardEndpoints" })
+            Summary = "Generate a new QrCode By Parent Endpoint",
+            Description = "This endpoint generates a new data for qrCode. For AuthorizedUser :- Self = 0, Other = 1. It requires Parent privilege",
+            OperationId = "qrCode.create",
+            Tags = new[] { "QrCodeEndpoints" })
         ]
         [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(ApiResponse<List<StudentInSchoolResponse>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<GenerateQrCodeResponse>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        [HttpGet("parent-mobile")]
-        public async Task<ActionResult<ApiResponse<List<StudentInSchoolResponse>>>> GetParentStudentsAsync()
+        [HttpPost("generate-qrcode")]
+        public async Task<ActionResult<ApiResponse<GenerateQrCodeResponse>>> CreateQrCodeAsync(GenerateQrCodeRequest request)
         {
-            var response = await _qrCodeService.GetTodaysQrCodeAsync(User.Identity!.Name ?? string.Empty);
+            request.UserEmail = User.Identity!.Name ?? string.Empty;
+
+            var response = await _qrCodeService.CreateQrCodeAsync(request);
             return HandleResult(response);
         }
-
     }
 }
