@@ -3,6 +3,7 @@ using Core.Entities.Users;
 using Core.Interfaces.Repositories;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Models.Responses;
 using Shared.Models.Responses;
 using static Shared.Constants.StringConstants;
@@ -12,9 +13,11 @@ namespace Infrastructure.Repositories
     public class QrCodeRepository : IQrCodeRepository
     {
         private readonly AppDbContext _dbContext;
-        public QrCodeRepository(AppDbContext dbContext)
+        private readonly ILogger<QrCodeRepository> _logger;
+        public QrCodeRepository(AppDbContext dbContext, ILogger<QrCodeRepository> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public async Task<BaseResponse> AddQrCode(QrCode qrCode)
@@ -45,6 +48,10 @@ namespace Infrastructure.Repositories
         public async Task<List<StudentInSchoolResponse>> GetTodaysQrCodeAsync(string email)
         {
             var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Email == email);
+            if (parent is null)
+            {
+                _logger.LogInformation("User with email {0} not found", email);
+            }
 
             var studentIds = await _dbContext.ParentStudent
                 .Where(x => x.ParentsId == parent.Id)
