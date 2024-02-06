@@ -2,12 +2,14 @@
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Models.Requests;
+using Shared.Models.Requests;
 using Shared.Models.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Shared.Constants.StringConstants;
 
 namespace Core.Services
 {
@@ -35,10 +37,7 @@ namespace Core.Services
 
             var newQrCode = new QrCode()
             {
-                AuthorizedUser = request.AuthorizedUser,
-                AuthorizedUserFirstName = request.AuthorizedUserFirstName,
-                AuthorizedUserLastName = request.AuthorizedUserLastName,
-                AuthorizedUserRelationship = request.AuthorizedUserRelationship,
+                Id = Guid.NewGuid(),
                 StudentId = request.StudentId,
                 UserEmail = request.UserEmail,
                 Created = DateTime.UtcNow,
@@ -56,8 +55,40 @@ namespace Core.Services
 
             response.Data = new GenerateQrCodeResponse()
             {
+                QrCodeId = newQrCode.Id,
                 QrCodeData = $"mystar_{newQrCode.UserEmail}_{newQrCode.StudentId}_{newQrCode.Created}"
             };
+
+            return response;
+        }
+
+        public async Task<BaseResponse> AuthorizeQrCode(AuthorizeQrCodeRequest request)
+        {
+            var response = new BaseResponse();
+
+            var qrCode = await _qrCodeRepository.GetQrCodeById(request.QrCodeId);
+            if (qrCode is null)
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Message = "QrCode doesnt exist";
+                return response;
+            }
+
+            // Update the QrCode properties
+            qrCode.AuthorizedUser = request.AuthorizedUser;
+            qrCode.AuthorizedUserFirstName = request.AuthorizedUserFirstName;
+            qrCode.AuthorizedUserFirstName = request.AuthorizedUserLastName;
+            qrCode.AuthorizedUserRelationship = request.AuthorizedUserRelationship;
+
+            var result = await _qrCodeRepository.EditQrCode(qrCode);
+            if (!result.Status)
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status500InternalServerError;
+                response.Message = result.Message;
+                return response;
+            }
 
             return response;
         }

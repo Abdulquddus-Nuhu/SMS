@@ -1,4 +1,5 @@
 ﻿using Models.Requests;
+using Shared.Models.Requests;
 using Shared.Models.Responses;
 using System;
 using System.Collections.Generic;
@@ -12,5 +13,6 @@ namespace Core.Interfaces.Services
     {
         public Task<ApiResponse<List<StudentInSchoolResponse>>> GetTodaysQrCodeAsync(string email);
         public Task<ApiResponse<GenerateQrCodeResponse>> CreateQrCodeAsync(GenerateQrCodeRequest request);
+        public Task<BaseResponse> AuthorizeQrCode(AuthorizeQrCodeRequest request);
     }
 }
