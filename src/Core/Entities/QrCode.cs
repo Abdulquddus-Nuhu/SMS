@@ -18,5 +18,6 @@ namespace Core.Entities
         public AuthorizedUserType AuthorizedUser { get; set; } = AuthorizedUserType.Self;
         public string? AuthorizedUserRelationship { get; set; }
         public string? AuthorizedUserFullName { get; set; }
+        public string? AuthorizedUserPhoneNumber { get; set; }
     }
 }

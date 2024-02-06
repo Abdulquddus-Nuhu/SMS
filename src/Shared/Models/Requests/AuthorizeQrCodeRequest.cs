@@ -16,5 +16,7 @@ namespace Shared.Models.Requests
 
         public string? AuthorizedUserRelationship { get; set; }
         public string? AuthorizedUserFullName { get; set; }
+        public string? AuthorizedUserPhoneNumber { get; set; }
+
     }
 }

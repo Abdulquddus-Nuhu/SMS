@@ -50,7 +50,7 @@ namespace Infrastructure.Repositories
             var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Email == email);
             if (parent is null)
             {
-                _logger.LogInformation("User with email {0} not found", email);
+                _logger.LogInformation("User with email {0} not found in parents table", email);
             }
 
             var studentIds = await _dbContext.ParentStudent
