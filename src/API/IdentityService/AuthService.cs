@@ -78,7 +78,8 @@ namespace Core.Services
             {
                 response.Code = ResponseCodes.Status400BadRequest;
                 response.Status = false;
-                response.Message = "Authentication failed!";
+                //response.Message = "Authentication failed!";
+                response.Message = "The email or password you entered is incorrect. Please try again!";
                 return response;
             }
             var user = await _userManager.FindByEmailAsync(request.Email);
