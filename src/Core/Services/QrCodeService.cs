@@ -4,11 +4,6 @@ using Core.Interfaces.Services;
 using Models.Requests;
 using Shared.Models.Requests;
 using Shared.Models.Responses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Shared.Constants.StringConstants;
 
 namespace Core.Services
