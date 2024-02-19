@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
@@ -23,6 +24,8 @@ using Shared.Constants;
 using System.Reflection;
 using System.Text;
 using static Shared.Constants.StringConstants;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
 Log.Information($"Starting up MyStar Web Server!");
@@ -264,12 +267,13 @@ try
         options.AddPolicy(CORS_POLICY,
                           builder =>
                           {
-                              builder.WithOrigins();
-                              //builder.WithOrigins(new string[]
-                              //{
-                              //    "http://localhost:3000",
-                              //    "https://localhost:3000",
-                              //});
+                              builder.WithOrigins(new string[]
+                              {
+                                  "http://localhost:3000",
+                                  "https://localhost:3000",
+                                  "http://www.mystarsonline.com",
+                                  "https://www.mystarsonline.com"
+                              });
                               builder.AllowAnyMethod();
                               builder.AllowAnyHeader();
                           });
@@ -313,7 +317,17 @@ try
         {
             //c.SwaggerEndpoint($"/swagger/API-Host/swagger.json", "API-Host");
             c.SwaggerEndpoint($"/swagger/SPE Module/swagger.json", "SPE Module");
+
+            //const string swaggerRoutePrefix = "api-docs";
+            //c.RoutePrefix = swaggerRoutePrefix;
+            //foreach (var description in provider.ApiVersionDescriptions)
+            //{
+            //    c.SwaggerEndpoint(
+            //        $"/swagger/{description.GroupName}/swagger.json",
+            //        description.GroupName.ToUpperInvariant());
+            //}
         });
+
     }
 
     app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -345,30 +359,30 @@ finally
 }
 
 
-
-
-//var builder = WebApplication.CreateBuilder(args);
-
-//// Add services to the container.
-
-//builder.Services.AddControllers();
-//// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
-
-//var app = builder.Build();
-
-//// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
-
-//app.UseHttpsRedirection();
-
-//app.UseAuthorization();
-
-//app.MapControllers();
-
-//app.Run();
+public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
+{
+    readonly IApiVersionDescriptionProvider _provider;
+    public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider) =>
+        this._provider = provider;
+    public void Configure(SwaggerGenOptions options)
+    {
+        foreach (var description in _provider.ApiVersionDescriptions)
+        {
+            options.SwaggerDoc(
+                description.GroupName,
+                new OpenApiInfo()
+                {
+                    Version = description.ApiVersion.ToString(),
+                    Title = "KNHRMS Services API",
+                    Description = "Web API for KNHMRS Services",
+                    TermsOfService = new Uri("https://www.swdohcskano.com.ng/"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Hubuk Technology LTD",
+                        Email = "info@hubuk.ng",
+                        Url = new Uri("https://hubuk.ng")
+                    },
+                });
+        }
+    }
+}
