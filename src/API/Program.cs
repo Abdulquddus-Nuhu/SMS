@@ -261,23 +261,24 @@ try
     });
 
     //Add Cors
-    //const string CORS_POLICY = "CorsPolicy";
-    //builder.Services.AddCors(options =>
-    //{
-    //    options.AddPolicy(CORS_POLICY,
-    //                      builder =>
-    //                      {
-    //                          builder.WithOrigins(new string[]
-    //                          {
-    //                              "http://localhost:3000",
-    //                              "https://localhost:3000",
-    //                              "http://www.mystarsonline.com",
-    //                              "https://www.mystarsonline.com"
-    //                          });
-    //                          builder.AllowAnyMethod();
-    //                          builder.AllowAnyHeader();
-    //                      });
-    //});
+    const string CORS_POLICY = "CorsPolicy";
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(CORS_POLICY,
+                          builder =>
+                          {
+                              //builder.WithOrigins(new string[]
+                              //{
+                              //    "http://localhost:3000",
+                              //    "https://localhost:3000",
+                              //    "http://www.mystarsonline.com",
+                              //    "https://www.mystarsonline.com"
+                              //});
+                              builder.AllowAnyOrigin();
+                              builder.AllowAnyMethod();
+                              builder.AllowAnyHeader();
+                          });
+    });
 
     // Security and Production enhancements 
     if (!builder.Environment.IsDevelopment())
