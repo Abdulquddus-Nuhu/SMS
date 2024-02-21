@@ -220,10 +220,10 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<BaseResponse> ResetPasswordByAdminAsync(ResetPasswordByAdminRequest request)
+        public async Task<BaseResponse> ResetPasswordByAdminAsync(ResetPasswordByAdminRequest request, string modifier)
         {
             var response = new BaseResponse();
-            _logger.LogInformation("Resseting password for user  {0}, by Admin", request.Email);
+            _logger.LogInformation("Resseting password for user {0}, by Admin {1}", request.Email, modifier);
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user is null)
             {
