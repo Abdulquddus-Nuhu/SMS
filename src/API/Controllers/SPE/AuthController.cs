@@ -126,7 +126,7 @@ namespace API.Controllers.SPE
         [HttpPost("ResetPasswordByAdmin")]
         public async Task<ActionResult<BaseResponse>> ResetPasswordByAdminAsync([FromBody] ResetPasswordByAdminRequest request)
         {
-            var resetResponse = await _authService.ResetPasswordByAdminAsync(request);
+            var resetResponse = await _authService.ResetPasswordByAdminAsync(request, User.Identity!.Name ?? string.Empty);
             return HandleResult(resetResponse);
         }
 

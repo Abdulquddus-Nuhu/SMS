@@ -13,6 +13,6 @@ namespace Core.Interfaces.Services
         public Task<BaseResponse> ForgotPasswordAsync(ForgotPasswordRequest request);
         public Task<ApiResponse<string>> VerifyResetOtpAsync(VerifyOtpRequest request);
         public Task<BaseResponse> ResetPasswordAsync(ResetPasswordRequest request);
-        public Task<BaseResponse> ResetPasswordByAdminAsync(ResetPasswordByAdminRequest request);
+        public Task<BaseResponse> ResetPasswordByAdminAsync(ResetPasswordByAdminRequest request, string modifier);
     }
 }
