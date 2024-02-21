@@ -1,5 +1,6 @@
 ﻿using Models.Requests;
 using Models.Responses;
+using Shared.Models.Requests;
 using Shared.Models.Responses;
 
 namespace Core.Interfaces.Services
@@ -12,5 +13,6 @@ namespace Core.Interfaces.Services
         public Task<BaseResponse> ForgotPasswordAsync(ForgotPasswordRequest request);
         public Task<ApiResponse<string>> VerifyResetOtpAsync(VerifyOtpRequest request);
         public Task<BaseResponse> ResetPasswordAsync(ResetPasswordRequest request);
+        public Task<BaseResponse> ResetPasswordByAdminAsync(ResetPasswordByAdminRequest request);
     }
 }

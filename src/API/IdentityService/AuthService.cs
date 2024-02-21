@@ -10,6 +10,8 @@ using Models.Responses;
 using Shared.Models.Responses;
 using static Shared.Constants.StringConstants;
 using Infrastructure.Identity;
+using Shared.Models.Requests;
+using OtpNet;
 
 namespace Core.Services
 {
@@ -217,6 +219,41 @@ namespace Core.Services
 
             return response;
         }
+
+        public async Task<BaseResponse> ResetPasswordByAdminAsync(ResetPasswordByAdminRequest request)
+        {
+            var response = new BaseResponse();
+            _logger.LogInformation("Resseting password for user  {0}, by Admin", request.Email);
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user is null)
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status404NotFound;
+                _logger.LogWarning("User {0} not found in userManager store", request.Email);
+                response.Message = "Invalid User!";
+                return response;
+            }
+
+            // Generate a password reset token
+            string token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var resetResult = await _userManager.ResetPasswordAsync(user, token, request.NewPassword);
+            if (!resetResult.Succeeded)
+            {
+                response.Code = ResponseCodes.Status500InternalServerError;
+                _logger.LogWarning("Reseting password for user {0} is not successful", request.Email);
+                response.Message = string.Join(",", resetResult.Errors.Select(a => a.Description).ToArray());
+                _logger.LogWarning(response.Message);
+            }
+
+            _ = _mediator.Publish(new ResetPasswordByAdminEvent(new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, Id = user.Id, LastName = user.LastName, PhoneNumber = user.PhoneNumber, UserName = user.UserName }, request.NewPassword));
+
+
+            _logger.LogInformation("Reseting password for user {0} is successful", request.Email);
+
+            return response;
+        }
+
 
     }
 
