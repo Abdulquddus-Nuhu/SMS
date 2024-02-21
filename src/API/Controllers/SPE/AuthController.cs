@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Mime;
 using Core.Interfaces.Services;
 using Shared.Models.Requests;
+using Shared.Constants;
 
 namespace API.Controllers.SPE
 {
@@ -109,7 +110,7 @@ namespace API.Controllers.SPE
         }
 
 
-        [AllowAnonymous]
+        [Authorize(Policy = AuthConstants.Policies.ADMINS)]
         [SwaggerOperation(
             Summary = "ReSet a User Password By Admin",
             Description = "This endpoint reset user password with new one.It requires Admin priveleges.",

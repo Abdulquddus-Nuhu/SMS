@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Identity;
 using Infrastructure.Data;
 using Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
+using Shared.Models.Requests;
 
 namespace Core.Services
 {
@@ -844,6 +845,54 @@ namespace Core.Services
 
             return response;
         }
+
+        public async Task<BaseResponse> UpdateParentInfoAsync(Guid parentId, UpdateParentInfoRequest request, string editor)
+        {
+            var response = new BaseResponse();
+
+            var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Id == parentId);
+            if (parent is null)
+            {
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Status = false;
+                response.Message = "Parent not found";
+                return response;
+            }
+
+            parent.FirstName = request.FirstName ?? parent.FirstName;
+            parent.LastName = request.LastName ?? parent.LastName;
+            parent.PhoneNumber = request.PhoneNumber ?? parent.PhoneNumber;
+            parent.Edit(editor);
+
+            if (!(await _dbContext.TrySaveChangesAsync()))
+            {
+                response.Code = ResponseCodes.Status500InternalServerError;
+                response.Status = false;
+                response.Message = "Unable to update parent information";
+                return response;
+            }
+
+            var persona = await _userManager.FindByIdAsync(parent.PersonaId.ToString());
+            if (persona is null)
+            {
+                _logger.LogInformation("Parent account not found. Update not completed");
+                response.Code = ResponseCodes.Status500InternalServerError;
+                response.Status = false;
+                response.Message = "Unable to update because Parent User account was not found";
+                return response;
+            }
+            else
+            {
+                persona.FirstName = request.FirstName ?? persona.FirstName;
+                persona.LastName = request.LastName ?? persona.LastName;
+                persona.PhoneNumber = request.PhoneNumber ?? persona.PhoneNumber;
+                await _userManager.UpdateAsync(persona);
+            }
+
+            return response;
+        }
+
+
 
 
         private string UploadPhoto(IFormFile? photo, string folder, string fileNameAlias)

@@ -1,5 +1,6 @@
 ﻿using Models.Requests;
 using Models.Responses;
+using Shared.Models.Requests;
 using Shared.Models.Responses;
 
 namespace Core.Interfaces.Services
@@ -25,5 +26,6 @@ namespace Core.Interfaces.Services
 
         public Task<ApiResponse<List<PersonaResponse>>> GetUsersWithRole();
         public Task<BaseResponse> DeletePersonaAccountAsync(string email);
+        public Task<BaseResponse> UpdateParentInfoAsync(Guid parentId, UpdateParentInfoRequest request, string editor);
     }
 }

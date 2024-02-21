@@ -6,6 +6,7 @@ using Models.Requests;
 using Models.Responses;
 using Shared.Constants;
 using Shared.Controllers;
+using Shared.Models.Requests;
 using Shared.Models.Responses;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Mime;
@@ -394,6 +395,27 @@ namespace API.Controllers.SPE
         public async Task<ActionResult<BaseResponse>> DeletePersonaAccountAsync(string email)
         {
             var response = await _personaService.DeletePersonaAccountAsync(email);
+            return HandleResult(response);
+        }
+
+
+        [Authorize(Policy = AuthConstants.Roles.PARENT)]
+        [SwaggerOperation(
+         Summary = "Update Parent Information Endpoint",
+         Description = "This endpoint updates a parent information. It requires Parent privilege",
+         OperationId = "parent.update",
+         Tags = new[] { "PersonaEndpoints" })
+         ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPut("update-parent-info")]
+        public async Task<ActionResult<BaseResponse>> UpdateParentAsync(Guid parentId, [FromBody] UpdateParentInfoRequest request)
+        {
+            var response = await _personaService.UpdateParentInfoAsync(parentId, request, User.Identity!.Name ?? string.Empty);
             return HandleResult(response);
         }
 
