@@ -1,6 +1,6 @@
 ﻿namespace Models.Requests
 {
-    public class EditParentRequest
+    public record EditParentRequest
     {
         public string? FirstName { get; set; }
 
