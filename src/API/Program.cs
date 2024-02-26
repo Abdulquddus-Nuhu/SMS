@@ -267,14 +267,14 @@ try
         options.AddPolicy(CORS_POLICY,
                           builder =>
                           {
-                              //builder.WithOrigins(new string[]
-                              //{
-                              //    "http://localhost:3000",
-                              //    "https://localhost:3000",
-                              //    "http://www.mystarsonline.com",
-                              //    "https://www.mystarsonline.com"
-                              //});
-                              builder.AllowAnyOrigin();
+                              builder.WithOrigins(new string[]
+                              {
+                                  "http://localhost:3000",
+                                  "https://localhost:3000",
+                                  "http://www.mystarsonline.com",
+                                  "https://www.mystarsonline.com"
+                              });
+                              //builder.AllowAnyOrigin();
                               builder.AllowAnyMethod();
                               builder.AllowAnyHeader();
                           });
