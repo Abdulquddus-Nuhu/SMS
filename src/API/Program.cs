@@ -269,8 +269,6 @@ try
                           {
                               builder.WithOrigins(new string[]
                               {
-                                  "http://localhost:3000",
-                                  "https://localhost:3000",
                                   "http://www.mystarsonline.com",
                                   "https://www.mystarsonline.com"
                               });
