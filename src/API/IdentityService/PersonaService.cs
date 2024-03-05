@@ -242,6 +242,15 @@ namespace Core.Services
 
             if (request.BusServiceRequired)
             {
+                var bus = await _dbContext.Buses.FirstOrDefaultAsync(x => x.Id == request.BusId);
+                if (bus is null)
+                {
+                    response.Status = false;
+                    response.Code = ResponseCodes.Status400BadRequest;
+                    response.Message = "Bus doesnt exist";
+                    return response;
+                }
+
                 student = new Student()
                 {
                     Id = Guid.NewGuid(),
