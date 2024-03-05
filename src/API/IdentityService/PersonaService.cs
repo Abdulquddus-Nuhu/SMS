@@ -184,6 +184,14 @@ namespace Core.Services
         {
             var response = new ApiResponse<StudentResponse>() { Code = ResponseCodes.Status201Created };
 
+            if (!string.Equals(request.Password, request.ConfirmPassword))
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status400BadRequest;
+                response.Message = "Password Field not the same as that of ConfirmPassword field";
+                return response;
+            }
+
             var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Id == request.ParentId);
             if (parent is null)
             {
@@ -220,7 +228,7 @@ namespace Core.Services
                 user = new Persona() { Id = Guid.NewGuid(), FirstName = request.FirstName, LastName = request.LastName, Email = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com"), UserName = string.Concat(request.FirstName,  request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, EmailConfirmed = true };
             }
 
-            var creationResult = await _userManager.CreateAsync(user);
+            var creationResult = await _userManager.CreateAsync(user, request.Password);
             if (!creationResult.Succeeded)
             {
                 response.Code = ResponseCodes.Status400BadRequest;
@@ -292,6 +300,10 @@ namespace Core.Services
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
+
+            var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber };
+            _ = _mediator.Publish(new NewStudentCreatedEvent(personaResponse, request.Password, parent.FullName, parent.Email));
+
 
             response.Data = new StudentResponse() {StudentId = student.Id, PhotoUrl = user.PhotoUrl, FirstName = user.FirstName, BusServiceRequired = request.BusServiceRequired, LastName = user.LastName, Role = AuthConstants.Roles.STUDENT };
 
