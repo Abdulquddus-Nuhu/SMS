@@ -184,6 +184,14 @@ namespace Core.Services
         {
             var response = new ApiResponse<StudentResponse>() { Code = ResponseCodes.Status201Created };
 
+            if (!string.Equals(request.Password, request.ConfirmPassword))
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status400BadRequest;
+                response.Message = "Password Field not the same as that of ConfirmPassword field";
+                return response;
+            }
+
             var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.Id == request.ParentId);
             if (parent is null)
             {
@@ -220,7 +228,7 @@ namespace Core.Services
                 user = new Persona() { Id = Guid.NewGuid(), FirstName = request.FirstName, LastName = request.LastName, Email = string.Concat(request.FirstName, request.LastName, "@", "smsabuja", ".com"), UserName = string.Concat(request.FirstName,  request.LastName), PhotoUrl = photoUrl, PesonaType = PersonaType.Student, EmailConfirmed = true };
             }
 
-            var creationResult = await _userManager.CreateAsync(user);
+            var creationResult = await _userManager.CreateAsync(user, request.Password);
             if (!creationResult.Succeeded)
             {
                 response.Code = ResponseCodes.Status400BadRequest;
@@ -234,6 +242,15 @@ namespace Core.Services
 
             if (request.BusServiceRequired)
             {
+                var bus = await _dbContext.Buses.FirstOrDefaultAsync(x => x.Id == request.BusId);
+                if (bus is null)
+                {
+                    response.Status = false;
+                    response.Code = ResponseCodes.Status400BadRequest;
+                    response.Message = "Bus doesnt exist";
+                    return response;
+                }
+
                 student = new Student()
                 {
                     Id = Guid.NewGuid(),
@@ -292,6 +309,10 @@ namespace Core.Services
                 response.Code = ResponseCodes.Status500InternalServerError;
                 return response;
             }
+
+            var personaResponse = new PersonaResponse() { Email = user.Email, FirstName = user.FirstName, LastName = user.LastName, PhoneNumber = user.PhoneNumber };
+            _ = _mediator.Publish(new NewStudentCreatedEvent(personaResponse, request.Password, parent.FullName, parent.Email));
+
 
             response.Data = new StudentResponse() {StudentId = student.Id, PhotoUrl = user.PhotoUrl, FirstName = user.FirstName, BusServiceRequired = request.BusServiceRequired, LastName = user.LastName, Role = AuthConstants.Roles.STUDENT };
 
@@ -892,6 +913,85 @@ namespace Core.Services
             return response;
         }
 
+        public async Task<BaseResponse> DeleteUserByAdminAsync(Guid userId)
+        {
+            var response = new BaseResponse();
+
+            var persona = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            if (persona is null)
+            {
+                _logger.LogInformation("User with Id: {0} not found", userId);
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Message = "User not found";
+                response.Status = false;
+                return response;
+            }
+
+            var identityResult = await _userManager.DeleteAsync(persona);
+            if (!identityResult.Succeeded)
+            {
+                _logger.LogInformation("Unable to delete user: {0} from the backing store", persona.Email);
+                response.Code = ResponseCodes.Status500InternalServerError;
+                response.Message = "Unable to delete user! Please try again";
+                response.Status = false;
+                return response;
+            }
+
+            switch (persona.PesonaType)
+            {
+                case PersonaType.Admin:
+                    break;
+
+                case PersonaType.Parent:
+                    {
+                        var parent = await _dbContext.Parents.FirstOrDefaultAsync(x => x.PersonaId == persona.Id);
+                        if (parent is null) break;
+
+                        parent.Delete(persona.Email);
+                        break;
+                    }
+
+                case PersonaType.Student:
+                    {
+                        var student = await _dbContext.Students.FirstOrDefaultAsync(x => x.PersonaId == persona.Id);
+                        if (student is null) break;
+
+                        student.Delete(persona.Email);
+                        break;
+                    }
+
+                case PersonaType.BusDriver:
+                    {
+                        var busDriver = await _dbContext.Busdrivers.FirstOrDefaultAsync(x => x.PersonaId == persona.Id);
+                        if (busDriver is null) break;
+
+                        busDriver.Delete(persona.Email);
+                        break;
+                    }
+
+                case PersonaType.Staff:
+                    {
+                        var staff = await _dbContext.Staffs.FirstOrDefaultAsync(x => x.PersonaId == persona.Id);
+                        if (staff is null) break;
+
+                        staff.Delete(persona.Email);
+                        break;
+                    }
+
+                default:
+                    break;
+            }
+
+            if (!(await _dbContext.TrySaveChangesAsync()))
+            {
+                response.Code = ResponseCodes.Status500InternalServerError;
+                response.Status = false;
+                response.Message = "Unable to delete user account! Please try again";
+                return response;
+            }
+
+            return response;
+        }
 
 
 

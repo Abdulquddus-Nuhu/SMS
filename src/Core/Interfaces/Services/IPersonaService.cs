@@ -27,5 +27,6 @@ namespace Core.Interfaces.Services
         public Task<ApiResponse<List<PersonaResponse>>> GetUsersWithRole();
         public Task<BaseResponse> DeletePersonaAccountAsync(string email);
         public Task<BaseResponse> UpdateParentInfoAsync(Guid parentId, UpdateParentInfoRequest request, string editor);
+        public Task<BaseResponse> DeleteUserByAdminAsync(Guid userId);
     }
 }

@@ -419,6 +419,27 @@ namespace API.Controllers.SPE
             return HandleResult(response);
         }
 
+        [AllowAnonymous]
+        [SwaggerOperation(
+        Summary = "Delete A User By Admin Endpoint",
+        Description = "This endpoint deletes a user by admin account. It requires admin privelege",
+        OperationId = "persona.deleteByAdmin",
+        Tags = new[] { "PersonaEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpDelete("delete-user")]
+        public async Task<ActionResult<BaseResponse>> DeleteUserByAdminAsync(Guid userId)
+        {
+            var response = await _personaService.DeleteUserByAdminAsync(userId);
+            return HandleResult(response);
+        }
+
     }
 
 
