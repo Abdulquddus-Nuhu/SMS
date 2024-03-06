@@ -1,4 +1,5 @@
 ﻿using Core.Interfaces.Services;
+using Core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,10 +21,12 @@ namespace API.Controllers.SPE
     public class QrCodeController : BaseController
     {
         private readonly IQrCodeService _qrCodeService;
+        private readonly ITripService _tripService;
 
-        public QrCodeController(IQrCodeService qrCodeService)
+        public QrCodeController(IQrCodeService qrCodeService, ITripService tripService)
         {
             _qrCodeService = qrCodeService;
+            _tripService = tripService;
         }
 
 
@@ -89,6 +92,48 @@ namespace API.Controllers.SPE
         public async Task<ActionResult<ApiResponse<List<StudentWithQrCodeResponse>>>> GetParentStudentsAsync()
         {
             var response = await _qrCodeService.GetParentStudentsAsync(User.Identity!.Name ?? string.Empty);
+            return HandleResult(response);
+        }
+
+        //[Authorize(Roles = AuthConstants.Roles.BUS_DRIVER + ", " + AuthConstants.Roles.SUPER_ADMIN)]
+        [SwaggerOperation(
+        Summary = "Create a new trip Endpoint",
+        Description = "Requires Bus Driver or Super Admin privileges. For TripType :- PickUp = 0, DropOff = 1. ",
+        OperationId = "trip.create",
+        Tags = new[] { "TripEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPost("trip")]
+        public async Task<ActionResult<BaseResponse>> CreateTripAsync(CreateTripRequest request)
+        {
+            var response = await _tripService.CreateTripAsync(request, User.Identity!.Name ?? string.Empty);
+            return HandleResult(response);
+        }
+        
+        //[Authorize(Roles = AuthConstants.Roles.BUS_DRIVER + ", " + AuthConstants.Roles.SUPER_ADMIN)]
+        [SwaggerOperation(
+        Summary = "Gets the list of Endpoint",
+        Description = "Requires Bus Driver or Admin privileges",
+        OperationId = "trip.list",
+        Tags = new[] { "TripEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<List<TripResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpGet("trips")]
+        public async Task<ActionResult<ApiResponse<List<TripResponse>>>> TripListAsync()
+        {
+            var response = await _tripService.TripListAsync();
             return HandleResult(response);
         }
     }

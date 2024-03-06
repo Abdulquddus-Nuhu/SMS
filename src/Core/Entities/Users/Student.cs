@@ -56,6 +56,8 @@ namespace Core.Entities.Users
         //public Parent? Parent { get; set; }
         public List<Parent>? Parents { get; set; }
 
+        public ICollection<TripStudent> TripStudents { get; set; } = new List<TripStudent>();
+
         public void Delete(string deletor)
         {
             IsDeleted = true;
