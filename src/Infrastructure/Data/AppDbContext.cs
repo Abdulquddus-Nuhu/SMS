@@ -5,6 +5,7 @@ using Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace Infrastructure.Data
 {
@@ -27,6 +28,8 @@ namespace Infrastructure.Data
         public DbSet<Department> Departments { get; set; }
         public DbSet<Bus> Buses { get; set; }
         public DbSet<QrCode> QrCodes { get; set; }
+        public DbSet<Trip> Trips { get; set; }
+        public DbSet<TripStudent> TripStudents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -46,6 +49,19 @@ namespace Infrastructure.Data
                     .HasMany(e => e.Students)
                     .WithMany(e => e.Parents)
                     .UsingEntity<ParentStudent>();
+
+            builder.Entity<TripStudent>()
+                .HasKey(ts => new { ts.TripId, ts.StudentId }); // Composite key
+
+            builder.Entity<TripStudent>()
+                .HasOne(ts => ts.Trip)
+                .WithMany(t => t.TripStudents)
+                .HasForeignKey(ts => ts.TripId);
+
+            builder.Entity<TripStudent>()
+                .HasOne(ts => ts.Student)
+                .WithMany(s => s.TripStudents)
+                .HasForeignKey(ts => ts.StudentId);
 
         }
 

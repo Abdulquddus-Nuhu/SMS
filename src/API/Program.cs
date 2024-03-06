@@ -130,6 +130,7 @@ try
     builder.Services.AddTransient<IDepartmentRepository, DepartmentRepository>();
     builder.Services.AddTransient<IJobTitleRepository, JobTitleRepository>();
     builder.Services.AddTransient<IQrCodeRepository, QrCodeRepository>();
+    builder.Services.AddTransient<ITripRepository, TripRepository>();
 
 
     //Services
@@ -142,20 +143,9 @@ try
     builder.Services.AddTransient<IDepartmentService, DepartmentService>();
     builder.Services.AddTransient<IJobTitleService, JobTitleService>();
     builder.Services.AddTransient<IQrCodeService, QrCodeService>();
+    builder.Services.AddTransient<ITripService, TripService>();
 
 
-    //Services
-    //builder.Services.Scan(scan => scan.FromAssemblyOf<IAuthService>()
-    // .AddClasses(classes => classes.InNamespaceOf<AuthService>())
-    // .AsImplementedInterfaces()
-    // .WithTransientLifetime());
-
-
-    //Infrastructure 
-    //builder.Services.Scan(scan => scan.FromAssemblyOf<IOtpGenerator>()
-    // .AddClasses(classes => classes.InNamespaceOf<OtpGenerator>())
-    // .AsImplementedInterfaces()
-    // .WithTransientLifetime());
 
     builder.Services.AddTransient<IOtpGenerator, OtpGenerator>();
 
