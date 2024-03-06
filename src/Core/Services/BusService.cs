@@ -21,6 +21,7 @@ namespace Core.Services
             var bus = new Bus()
             {
                 Number = request.BusNumber,
+                NumberOfSeat = request.NumberOfSeat,
                 CreatedBy = creator,
                 Created = DateTime.UtcNow,
             };
@@ -38,6 +39,7 @@ namespace Core.Services
                 Data = await buses.Select(x => new BusResponse()
                 {
                     Id = x.Id,
+                    NumberOfSeat = x.NumberOfSeat,
                     BusNumber = x.Number
                 }).ToListAsync()
             };

@@ -11,5 +11,6 @@ namespace Core.Entities
     {
         [StringLength(50)]
         public string Number { get; set; } = string.Empty;
+        public int NumberOfSeat { get; set; }
     }
 }
