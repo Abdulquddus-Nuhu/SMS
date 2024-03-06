@@ -100,7 +100,7 @@ namespace API.Controllers.SPE
         Summary = "Create a new trip Endpoint",
         Description = "Requires Bus Driver or Super Admin privileges. For TripType :- PickUp = 0, DropOff = 1. ",
         OperationId = "trip.create",
-        Tags = new[] { "TripEndpoints" })
+        Tags = new[] { "QrCodeEndpoints" })
         ]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
@@ -109,7 +109,7 @@ namespace API.Controllers.SPE
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        [HttpPost("trip")]
+        [HttpPost("create-trip")]
         public async Task<ActionResult<BaseResponse>> CreateTripAsync(CreateTripRequest request)
         {
             var response = await _tripService.CreateTripAsync(request, User.Identity!.Name ?? string.Empty);
@@ -121,7 +121,8 @@ namespace API.Controllers.SPE
         Summary = "Gets the list of Endpoint",
         Description = "Requires Bus Driver or Admin privileges",
         OperationId = "trip.list",
-        Tags = new[] { "TripEndpoints" })
+        Tags = new[] { "QrCodeEndpoints" })
+        //Tags = new[] { "TripEndpoints" })
         ]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(ApiResponse<List<TripResponse>>), StatusCodes.Status200OK)]
@@ -130,7 +131,7 @@ namespace API.Controllers.SPE
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        [HttpGet("trips")]
+        [HttpGet("trip-list")]
         public async Task<ActionResult<ApiResponse<List<TripResponse>>>> TripListAsync()
         {
             var response = await _tripService.TripListAsync();
