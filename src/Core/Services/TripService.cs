@@ -1,7 +1,10 @@
 ﻿using Core.Entities;
+using Core.Entities.Users;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Models.Responses;
 using Shared.Models.Requests;
 using Shared.Models.Responses;
 using System;
@@ -15,9 +18,16 @@ namespace Core.Services
     public class TripService : ITripService
     {
         private readonly ITripRepository _tripRepository;
-        public TripService(ITripRepository tripRepository)
+        private readonly IStudentRepository _studentRepository;
+        private readonly IBusDriverRepository _busDriverRepository;
+        private readonly ILogger<TripService> _logger;
+        public TripService(ITripRepository tripRepository, IStudentRepository studentRepository,
+            IBusDriverRepository busDriverRepository, ILogger<TripService> logger)
         {
             _tripRepository = tripRepository;
+            _studentRepository = studentRepository;
+            _busDriverRepository = busDriverRepository;
+            _logger = logger;
         }
 
         public async Task<BaseResponse> CreateTripAsync(CreateTripRequest request, string driver)
@@ -54,5 +64,52 @@ namespace Core.Services
                 }).ToListAsync()
             };
         }
+
+        public async Task<BaseResponse> AddStudentToTripAsync(AddStudentToTripRequest request)
+        {
+            var tripStudent = new TripStudent
+            {
+                Id = Guid.NewGuid(),
+                TripId = request.TripId,
+                StudentId = request.StudentId,
+                EnrollmentDate = DateTime.UtcNow
+            };
+
+            return await _tripRepository.AddStudentToTripAsync(tripStudent);
+        }
+
+        //public async Task<ApiResponse<IEnumerable<StudentResponse>>> GetNotOnboardedStudentAsync(Guid tripId, string busDriverEmail)
+        //{
+        //    var busDriver = await _busDriverRepository.GetBusdriverByEmail(busDriverEmail);
+        //    if (busDriver is null)
+        //    {
+        //        _logger.LogInformation("Bus driver not found when trying to get not onboarded student.");
+        //        return new ApiResponse<IEnumerable<StudentResponse>>()
+        //        {
+        //            Data = Enumerable.Empty<StudentResponse>()
+        //        };
+        //    }
+
+        //    var allStudents = await _studentRepository.GetStudentsWithBusServiceAsync(busDriver.BusId.Value).ToListAsync();
+        //    var tripStudents = await _tripRepository.GetTripStudentsByTripId(tripId).ToListAsync();
+
+
+        //    var onboardedStudentIds = tripStudents.Select(ts => ts.StudentId).ToHashSet();
+        //    var notOnboardedStudents = allStudents.Where(s => !onboardedStudentIds.Contains(s.Id));
+
+
+        //    return new ApiResponse<IEnumerable<StudentResponse>>()
+        //    {
+        //        Data = notOnboardedStudents.Select(x => new StudentResponse()
+        //        {
+        //            StudentId = x.Id,
+        //            FirstName = x.FirstName,
+        //            LastName = x.LastName,
+        //            PhotoUrl = x.PhotoUrl,
+        //            Grade = x.Grade.Name,
+        //        })
+        //    };
+
+        //}
     }
 }

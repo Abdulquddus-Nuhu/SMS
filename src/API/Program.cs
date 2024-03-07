@@ -131,6 +131,8 @@ try
     builder.Services.AddTransient<IJobTitleRepository, JobTitleRepository>();
     builder.Services.AddTransient<IQrCodeRepository, QrCodeRepository>();
     builder.Services.AddTransient<ITripRepository, TripRepository>();
+    builder.Services.AddTransient<IStudentRepository, StudentRepository>();
+    builder.Services.AddTransient<IBusDriverRepository, BusDriverRepository>();
 
 
     //Services

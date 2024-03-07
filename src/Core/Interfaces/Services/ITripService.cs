@@ -1,4 +1,5 @@
-﻿using Shared.Models.Requests;
+﻿using Models.Responses;
+using Shared.Models.Requests;
 using Shared.Models.Responses;
 using System;
 using System.Collections.Generic;
@@ -12,5 +13,7 @@ namespace Core.Interfaces.Services
     {
         public Task<BaseResponse> CreateTripAsync(CreateTripRequest request, string driver);
         public Task<ApiResponse<List<TripResponse>>> TripListAsync();
+        public Task<ApiResponse<IEnumerable<StudentResponse>>> GetNotOnboardedStudentAsync(Guid tripId, string busDriverEmail);
+        public Task<BaseResponse> AddStudentToTripAsync(AddStudentToTripRequest request);
     }
 }
