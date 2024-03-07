@@ -46,6 +46,43 @@ namespace Infrastructure.Repositories
         {
             return await _dbContext.Trips.FirstOrDefaultAsync(t => t.Id == id);
         }
+        
+        public async Task<Trip?> GetNotOnbardedStudentAsync(Guid id)
+        {
+            return await _dbContext.Trips.FirstOrDefaultAsync(t => t.Id == id);
+        }
+        
+        public async Task<Trip?> GetOnbardedStudentAsync(Guid id)
+        {
+            return await _dbContext.Trips.FirstOrDefaultAsync(t => t.Id == id);
+        }
+
+        public IQueryable<TripStudent> GetTripStudentsByTripId(Guid tripId)
+        {
+            return _dbContext.TripStudents
+                                 .Where(ts => ts.TripId == tripId)
+                                 //.Include(ts => ts.Student) // Optionally include Student details
+                                 .AsNoTracking();
+        }
+
+        public async Task<BaseResponse> AddStudentToTripAsync(TripStudent tripStudent)
+        {
+            var response = new BaseResponse() { Code = ResponseCodes.Status201Created };
+
+            await _dbContext.TripStudents.AddAsync(tripStudent);
+
+            var result = await _dbContext.TrySaveChangesAsync();
+            if (result)
+            {
+                return response;
+            }
+
+            response.Message = "Unable to add student to the trip! Please try again";
+            response.Status = false;
+            response.Code = ResponseCodes.Status500InternalServerError;
+
+            return response;
+        }
 
         public Task UpdateAsync(Trip trip)
         {
