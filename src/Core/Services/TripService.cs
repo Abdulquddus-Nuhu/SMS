@@ -78,38 +78,38 @@ namespace Core.Services
             return await _tripRepository.AddStudentToTripAsync(tripStudent);
         }
 
-        //public async Task<ApiResponse<IEnumerable<StudentResponse>>> GetNotOnboardedStudentAsync(Guid tripId, string busDriverEmail)
-        //{
-        //    var busDriver = await _busDriverRepository.GetBusdriverByEmail(busDriverEmail);
-        //    if (busDriver is null)
-        //    {
-        //        _logger.LogInformation("Bus driver not found when trying to get not onboarded student.");
-        //        return new ApiResponse<IEnumerable<StudentResponse>>()
-        //        {
-        //            Data = Enumerable.Empty<StudentResponse>()
-        //        };
-        //    }
+        public async Task<ApiResponse<IEnumerable<StudentResponse>>> GetNotOnboardedStudentAsync(Guid tripId, string busDriverEmail)
+        {
+            var busDriver = await _busDriverRepository.GetBusdriverByEmail(busDriverEmail);
+            if (busDriver is null)
+            {
+                _logger.LogInformation("Bus driver not found when trying to get not onboarded student.");
+                return new ApiResponse<IEnumerable<StudentResponse>>()
+                {
+                    Data = Enumerable.Empty<StudentResponse>()
+                };
+            }
 
-        //    var allStudents = await _studentRepository.GetStudentsWithBusServiceAsync(busDriver.BusId.Value).ToListAsync();
-        //    var tripStudents = await _tripRepository.GetTripStudentsByTripId(tripId).ToListAsync();
-
-
-        //    var onboardedStudentIds = tripStudents.Select(ts => ts.StudentId).ToHashSet();
-        //    var notOnboardedStudents = allStudents.Where(s => !onboardedStudentIds.Contains(s.Id));
+            var allStudents = await _studentRepository.GetStudentsWithBusServiceAsync(busDriver.BusId.Value).ToListAsync();
+            var tripStudents = await _tripRepository.GetTripStudentsByTripId(tripId).ToListAsync();
 
 
-        //    return new ApiResponse<IEnumerable<StudentResponse>>()
-        //    {
-        //        Data = notOnboardedStudents.Select(x => new StudentResponse()
-        //        {
-        //            StudentId = x.Id,
-        //            FirstName = x.FirstName,
-        //            LastName = x.LastName,
-        //            PhotoUrl = x.PhotoUrl,
-        //            Grade = x.Grade.Name,
-        //        })
-        //    };
+            var onboardedStudentIds = tripStudents.Select(ts => ts.StudentId).ToHashSet();
+            var notOnboardedStudents = allStudents.Where(s => !onboardedStudentIds.Contains(s.Id));
 
-        //}
+
+            return new ApiResponse<IEnumerable<StudentResponse>>()
+            {
+                Data = notOnboardedStudents.Select(x => new StudentResponse()
+                {
+                    StudentId = x.Id,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    PhotoUrl = x.PhotoUrl,
+                    Grade = x.Grade.Name,
+                })
+            };
+
+        }
     }
 }
