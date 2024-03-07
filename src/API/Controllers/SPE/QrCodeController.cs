@@ -139,25 +139,6 @@ namespace API.Controllers.SPE
             return HandleResult(response);
         }
 
-        [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
-        [SwaggerOperation(
-        Summary = "Gets the list of students not onboarded for a specific trip",
-        Description = "Requires Bus Driver privileges",
-        OperationId = "student.getNotOnboarded",
-        Tags = new[] { "QrCodeEndpoints" })]
-        [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(ApiResponse<IEnumerable<StudentResponse>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        [HttpGet("trip/not-onboarded/{tripId}")]
-        public async Task<ActionResult<ApiResponse<IEnumerable<StudentResponse>>>> GetNotOnboardedStudentsAsync(Guid tripId)
-        {
-            // Assuming GetNotOnboardedStudentAsync returns a list of StudentResponse and ApiResponse encapsulates the response data
-            var response = await _tripService.GetNotOnboardedStudentAsync(tripId, User.Identity!.Name ?? string.Empty);
-            return HandleResult(response);
-        }
 
         [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
         [SwaggerOperation(
@@ -175,6 +156,45 @@ namespace API.Controllers.SPE
         public async Task<ActionResult<BaseResponse>> AddStudentToTrip([FromBody] AddStudentToTripRequest request)
         {
             var response = await _tripService.AddStudentToTripAsync(request);
+            return HandleResult(response);
+        }
+
+
+        [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
+        [SwaggerOperation(
+        Summary = "Gets the list of students not onboarded for a specific trip",
+        Description = "Requires Bus Driver privileges",
+        OperationId = "students.getNotOnboarded",
+        Tags = new[] { "QrCodeEndpoints" })]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<IEnumerable<StudentResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpGet("trip/not-onboarded/{tripId}")]
+        public async Task<ActionResult<ApiResponse<IEnumerable<StudentResponse>>>> GetNotOnboardedStudentsAsync(Guid tripId)
+        {
+            var response = await _tripService.GetNotOnboardedStudentAsync(tripId, User.Identity!.Name ?? string.Empty);
+            return HandleResult(response);
+        }
+        
+        [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
+        [SwaggerOperation(
+        Summary = "Gets the list of students onboarded for a specific trip",
+        Description = "Requires Bus Driver privileges",
+        OperationId = "students.getOnboarded",
+        Tags = new[] { "QrCodeEndpoints" })]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<IEnumerable<StudentResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpGet("trip/onboarded/{tripId}")]
+        public async Task<ActionResult<ApiResponse<IEnumerable<StudentResponse>>>> GetOnboardedStudentsAsync(Guid tripId)
+        {
+            var response = await _tripService.GetOnboardedStudentAsync(tripId, User.Identity!.Name ?? string.Empty);
             return HandleResult(response);
         }
     }
