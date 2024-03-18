@@ -140,62 +140,62 @@ namespace API.Controllers.SPE
         }
 
 
-        //[Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
-        //[SwaggerOperation(
-        //Summary = "Add A Student To A Trip Endpoint.",
-        //Description = "Requires Bus Driver privileges",
-        //OperationId = "trip.addStudent",
-        //Tags = ["QrCodeEndpoints"])]
-        //[Produces(MediaTypeNames.Application.Json)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        //[HttpPost("trip/add-student")]
-        //public async Task<ActionResult<BaseResponse>> AddStudentToTrip([FromBody] AddStudentToTripRequest request)
-        //{
-        //    var response = await _tripService.AddStudentToTripAsync(request);
-        //    return HandleResult(response);
-        //}
+        [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
+        [SwaggerOperation(
+        Summary = "Add A Student To A Trip Endpoint.",
+        Description = "Requires Bus Driver privileges",
+        OperationId = "trip.addStudent",
+        Tags = ["QrCodeEndpoints"])]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPost("trip/add-student")]
+        public async Task<ActionResult<BaseResponse>> AddStudentToTrip([FromBody] AddStudentToTripRequest request)
+        {
+            var response = await _tripService.AddStudentToTripAsync(request);
+            return HandleResult(response);
+        }
 
 
-        //[Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
-        //[SwaggerOperation(
-        //Summary = "Gets the list of students not onboarded for a specific trip",
-        //Description = "Requires Bus Driver privileges",
-        //OperationId = "students.getNotOnboarded",
-        //Tags = new[] { "QrCodeEndpoints" })]
-        //[Produces(MediaTypeNames.Application.Json)]
-        //[ProducesResponseType(typeof(ApiResponse<IEnumerable<StudentResponse>>), StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        //[HttpGet("trip/not-onboarded/{tripId}")]
-        //public async Task<ActionResult<ApiResponse<IEnumerable<StudentResponse>>>> GetNotOnboardedStudentsAsync(Guid tripId)
-        //{
-        //    var response = await _tripService.GetNotOnboardedStudentAsync(tripId, User.Identity!.Name ?? string.Empty);
-        //    return HandleResult(response);
-        //}
-        
-        //[Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
-        //[SwaggerOperation(
-        //Summary = "Gets the list of students onboarded for a specific trip",
-        //Description = "Requires Bus Driver privileges",
-        //OperationId = "students.getOnboarded",
-        //Tags = new[] { "QrCodeEndpoints" })]
-        //[Produces(MediaTypeNames.Application.Json)]
-        //[ProducesResponseType(typeof(ApiResponse<IEnumerable<StudentResponse>>), StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
-        //[ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        //[HttpGet("trip/onboarded/{tripId}")]
-        //public async Task<ActionResult<ApiResponse<IEnumerable<StudentResponse>>>> GetOnboardedStudentsAsync(Guid tripId)
-        //{
-        //    var response = await _tripService.GetOnboardedStudentAsync(tripId, User.Identity!.Name ?? string.Empty);
-        //    return HandleResult(response);
-        //}
+        [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
+        [SwaggerOperation(
+        Summary = "Gets the list of students not onboarded for a specific trip",
+        Description = "Requires Bus Driver privileges",
+        OperationId = "students.getNotOnboarded",
+        Tags = new[] { "QrCodeEndpoints" })]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<IEnumerable<StudentResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpGet("trip/not-onboarded/{tripId}")]
+        public async Task<ActionResult<ApiResponse<IEnumerable<StudentResponse>>>> GetNotOnboardedStudentsAsync(Guid tripId)
+        {
+            var response = await _tripService.GetNotOnboardedStudentAsync(tripId, User.Identity!.Name ?? string.Empty);
+            return HandleResult(response);
+        }
+
+        [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
+        [SwaggerOperation(
+        Summary = "Gets the list of students onboarded for a specific trip",
+        Description = "Requires Bus Driver privileges",
+        OperationId = "students.getOnboarded",
+        Tags = new[] { "QrCodeEndpoints" })]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(ApiResponse<IEnumerable<StudentResponse>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpGet("trip/onboarded/{tripId}")]
+        public async Task<ActionResult<ApiResponse<IEnumerable<StudentResponse>>>> GetOnboardedStudentsAsync(Guid tripId)
+        {
+            var response = await _tripService.GetOnboardedStudentAsync(tripId, User.Identity!.Name ?? string.Empty);
+            return HandleResult(response);
+        }
     }
 }
