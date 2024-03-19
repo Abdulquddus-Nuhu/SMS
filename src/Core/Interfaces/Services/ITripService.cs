@@ -11,7 +11,7 @@ namespace Core.Interfaces.Services
 {
     public interface ITripService
     {
-        public Task<BaseResponse> CreateTripAsync(CreateTripRequest request, string driver);
+        public Task<ApiResponse<Guid?>> CreateTripAsync(CreateTripRequest request, string driver);
         public Task<ApiResponse<List<TripResponse>>> TripListAsync();
         public Task<BaseResponse> AddStudentToTripAsync(AddStudentToTripRequest request);
         public Task<ApiResponse<IEnumerable<StudentResponse>>> GetNotOnboardedStudentAsync(Guid tripId, string busDriverEmail);

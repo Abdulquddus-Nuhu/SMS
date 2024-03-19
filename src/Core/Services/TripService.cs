@@ -30,12 +30,13 @@ namespace Core.Services
             _logger = logger;
         }
 
-        public async Task<BaseResponse> CreateTripAsync(CreateTripRequest request, string driver)
+        public async Task<ApiResponse<Guid?>> CreateTripAsync(CreateTripRequest request, string driver)
         {
-            var response = new BaseResponse();
+            var response = new ApiResponse<Guid?>();
 
             var trip = new Trip
             {
+                Id = Guid.NewGuid(),
                 BusDriver = driver,
                 FuelCousumption = request.FuelConsumption,
                 IsReFuel = request.IsRefuel,
@@ -44,7 +45,16 @@ namespace Core.Services
                 TripType = request.TripType,
             };
 
-            response = await _tripRepository.AddAsync(trip);
+            var result = await _tripRepository.AddAsync(trip);
+            if (!result.Status)
+            {
+                response.Data = null;
+                response.Code = result.Code;
+                response.Message = result.Message;
+                response.Status = result.Status;
+            }
+
+            response.Data = trip.Id;
             return response;
         }
 

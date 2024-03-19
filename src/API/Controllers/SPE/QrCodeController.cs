@@ -105,13 +105,13 @@ namespace API.Controllers.SPE
         ]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse<Guid?>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
         [HttpPost("create-trip")]
-        public async Task<ActionResult<BaseResponse>> CreateTripAsync(CreateTripRequest request)
+        public async Task<ActionResult<ApiResponse<Guid?>>> CreateTripAsync(CreateTripRequest request)
         {
             var response = await _tripService.CreateTripAsync(request, User.Identity!.Name ?? string.Empty);
             return HandleResult(response);
