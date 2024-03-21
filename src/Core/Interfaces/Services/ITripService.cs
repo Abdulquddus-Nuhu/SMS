@@ -16,5 +16,6 @@ namespace Core.Interfaces.Services
         public Task<BaseResponse> AddStudentToTripAsync(AddStudentToTripRequest request);
         public Task<ApiResponse<IEnumerable<StudentResponse>>> GetNotOnboardedStudentAsync(Guid tripId, string busDriverEmail);
         public Task<ApiResponse<IEnumerable<StudentResponse>>> GetOnboardedStudentAsync(Guid tripId, string busDriverEmail);
+        public Task<BaseResponse> RemoveStudentFromTripAsync(RemoveStudentFromTripRequest request);
     }
 }

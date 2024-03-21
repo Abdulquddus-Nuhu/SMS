@@ -13,9 +13,11 @@ namespace Core.Interfaces.Repositories
         public Task<Trip?> GetByIdAsync(Guid id);
         public IQueryable<Trip> GetAllAsync();
         public Task<BaseResponse> AddAsync(Trip trip);
+        public Task<BaseResponse> AddStudentToTripAsync(TripStudent tripStudent);
+        public Task<BaseResponse> RemoveStudentFromTripAsync(Guid tripId, Guid studentId);
         public Task UpdateAsync(Trip trip);
         public Task DeleteAsync(Trip trip);
         public IQueryable<TripStudent> GetTripStudentsByTripId(Guid tripId);
-        public Task<BaseResponse> AddStudentToTripAsync(TripStudent tripStudent);
+        Task GetTripStudentAsync(Guid tripId, Guid studentId);
     }
 }

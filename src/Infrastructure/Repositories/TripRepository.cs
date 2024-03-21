@@ -46,16 +46,6 @@ namespace Infrastructure.Repositories
         {
             return await _dbContext.Trips.FirstOrDefaultAsync(t => t.Id == id);
         }
-        
-        public async Task<Trip?> GetNotOnbardedStudentAsync(Guid id)
-        {
-            return await _dbContext.Trips.FirstOrDefaultAsync(t => t.Id == id);
-        }
-        
-        public async Task<Trip?> GetOnbardedStudentAsync(Guid id)
-        {
-            return await _dbContext.Trips.FirstOrDefaultAsync(t => t.Id == id);
-        }
 
         public IQueryable<TripStudent> GetTripStudentsByTripId(Guid tripId)
         {
@@ -84,11 +74,43 @@ namespace Infrastructure.Repositories
             return response;
         }
 
+        public async Task<BaseResponse> RemoveStudentFromTripAsync(Guid tripId, Guid studentId)
+        {
+            var response = new BaseResponse();
+
+            var tripStudent = await _dbContext.TripStudents
+                .FirstOrDefaultAsync(ts => ts.TripId == tripId && ts.StudentId == studentId);
+
+            if (tripStudent != null)
+            {
+                _logger.LogInformation($"Removing student {studentId} from trip {tripId}");
+
+                _dbContext.TripStudents.Remove(tripStudent);
+
+                if (!await _dbContext.TrySaveChangesAsync())
+                {
+                    _logger.LogInformation($"Unable to remove student {studentId} from trip {tripId}");
+                    response.Status = false;
+                    response.Message = "Unable to remove student from the trip! Please try again";
+                    response.Code = ResponseCodes.Status500InternalServerError;
+                    return response;
+                }
+            }
+
+            return response;
+        }
+
+
         public Task UpdateAsync(Trip trip)
         {
             throw new NotImplementedException();
         }
         public Task DeleteAsync(Trip trip)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetTripStudentAsync(Guid tripId, Guid studentId)
         {
             throw new NotImplementedException();
         }
