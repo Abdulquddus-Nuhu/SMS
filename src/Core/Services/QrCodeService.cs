@@ -119,6 +119,7 @@ namespace Core.Services
 
         public async Task<ApiResponse<List<GenerateQrCodeResponse>>> GenerateQrCodesForTripAsync(Guid tripId, string busDriverEmail)
         {
+            //TOdo: check if busDriver has already generate qrcode for the day before proceding
             var response = new ApiResponse<List<GenerateQrCodeResponse>>();
 
             List<GenerateQrCodeResponse> qrCodesResponse = new();
