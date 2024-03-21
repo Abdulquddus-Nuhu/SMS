@@ -17,5 +17,6 @@ namespace Core.Interfaces.Repositories
         public Task<BaseResponse> EditQrCode(QrCode qrCode);
         public Task<List<StudentWithQrCodeResponse>> GetParentStudentsAsync(string email);
         public Task<BaseResponse> QrCodeExist(Guid studentId, string parentEmail);
+        public Task<BaseResponse> AddQrCodes(List<QrCode> qrCodes);
     }
 }

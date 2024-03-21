@@ -39,6 +39,24 @@ namespace Infrastructure.Repositories
             return response;
 
         }
+        public async Task<BaseResponse> AddQrCodes(List<QrCode> qrCodes)
+        {
+            var response = new BaseResponse() { Code = ResponseCodes.Status201Created };
+
+            await _dbContext.QrCodes.AddRangeAsync(qrCodes);
+
+            var result = await _dbContext.TrySaveChangesAsync();
+            if (result)
+            {
+                return response;
+            }
+
+            response.Message = "Unable to generate qrcodes! Please try again";
+            response.Status = false;
+            response.Code = ResponseCodes.Status500InternalServerError;
+
+            return response;
+        }
 
         public async Task<IQueryable<QrCode>> GetAllAsync()
         {

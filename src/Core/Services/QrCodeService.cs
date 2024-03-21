@@ -1,7 +1,10 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
+using MediatR;
+using Microsoft.Extensions.Logging;
 using Models.Requests;
+using Models.Responses;
 using Shared.Models.Requests;
 using Shared.Models.Responses;
 using static Shared.Constants.StringConstants;
@@ -11,9 +14,15 @@ namespace Core.Services
     public class QrCodeService : IQrCodeService
     {
         private readonly IQrCodeRepository _qrCodeRepository;
-        public QrCodeService(IQrCodeRepository qrCodeRepository)
+        private readonly ITripRepository _tripRepository;
+        private readonly ITripService _tripService;
+        private readonly ILogger<QrCodeService> _logger;
+        public QrCodeService(IQrCodeRepository qrCodeRepository, ITripRepository tripRepository, ITripService tripService, ILogger<QrCodeService> logger)
         {
-                _qrCodeRepository = qrCodeRepository;
+            _qrCodeRepository = qrCodeRepository;
+            _tripRepository = tripRepository;
+            _tripService = tripService;
+            _logger = logger;
         }
 
         public async Task<ApiResponse<List<StudentInSchoolResponse>>> GetTodaysQrCodeAsync(string email)
@@ -104,6 +113,82 @@ namespace Core.Services
                 return response;
             }
 
+            return response;
+        }
+
+
+        public async Task<ApiResponse<List<GenerateQrCodeResponse>>> GenerateQrCodesForTripAsync(Guid tripId, string busDriverEmail)
+        {
+            var response = new ApiResponse<List<GenerateQrCodeResponse>>();
+
+            List<GenerateQrCodeResponse> qrCodesResponse = new();
+
+            List<StudentResponse> onboardedStudents = (await _tripService.GetOnboardedStudentAsync(tripId, busDriverEmail)).Data.ToList();
+
+            List<QrCode> newQrCodes = new();
+
+            //FOREACH LOOP TO ADD QRCODE IN DB
+            //foreach (var student in onboardedStudents)
+            //{
+            //    var newQrCode = new QrCode()
+            //    {
+            //        Id = Guid.NewGuid(),
+            //        StudentId = student.StudentId,
+            //        UserEmail = busDriverEmail,
+            //        Created = DateTime.UtcNow,
+            //    };
+
+            //    //todo: roundtrip to database here
+            //    //await _qrCodeRepository.AddQrCode(newQrCode);
+
+            //    var result = await _qrCodeRepository.AddQrCode(newQrCode);
+            //    if (!result.Status)
+            //    {
+            //        _logger.LogInformation($"Student {student.StudentId} qrcode wasn't generated on trip {tripId}. Code {result.Code}. Message {result.Message}");
+            //        continue;
+            //    }
+
+            //    qrCodesResponse.Add(new()
+            //    {
+            //        QrCodeId = newQrCode.Id,
+            //        QrCodeData = $"mystar_{newQrCode.UserEmail}_{newQrCode.StudentId}_{newQrCode.Created}"
+            //    });
+
+            //}
+
+
+            //Create qrcode for all students
+            foreach (var student in onboardedStudents)
+            {
+                var newQrCode = new QrCode()
+                {
+                    Id = Guid.NewGuid(),
+                    StudentId = student.StudentId,
+                    UserEmail = busDriverEmail,
+                    Created = DateTime.UtcNow,
+                };
+
+                newQrCodes.Add(newQrCode);
+            }
+
+            //Save all created qrcodes to database
+            var result = await _qrCodeRepository.AddQrCodes(newQrCodes);
+            if (!result.Status)
+            {
+                _logger.LogInformation("{0}", result.Message);
+            }
+
+            //Transform all created qrcodes to response
+            foreach (var newQrCode in newQrCodes)
+            {
+                qrCodesResponse.Add(new()
+                {
+                    QrCodeId = newQrCode.Id,
+                    QrCodeData = $"mystar_{newQrCode.UserEmail}_{newQrCode.StudentId}_{newQrCode.Created}"
+                });
+            }
+
+            response.Data = qrCodesResponse;
             return response;
         }
 
