@@ -159,6 +159,25 @@ namespace API.Controllers.SPE
             return HandleResult(response);
         }
 
+        [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
+        [SwaggerOperation(
+        Summary = "Remove a student from a trip Endpoint",
+        Description = "Requires Bus Driver privileges",
+        OperationId = "students.remove",
+        Tags = new[] { "QrCodeEndpoints" })]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPost("trip/remove-student")]
+        public async Task<ActionResult<BaseResponse>> RemoveStudentFromTrip([FromBody] RemoveStudentFromTripRequest request)
+        {
+            var response = await _tripService.RemoveStudentFromTripAsync(request);
+            return HandleResult(response);
+        }
+
 
         [Authorize(Roles = AuthConstants.Roles.BUS_DRIVER)]
         [SwaggerOperation(
@@ -197,5 +216,6 @@ namespace API.Controllers.SPE
             var response = await _tripService.GetOnboardedStudentAsync(tripId, User.Identity!.Name ?? string.Empty);
             return HandleResult(response);
         }
+
     }
 }

@@ -156,5 +156,10 @@ namespace Core.Services
 
         }
 
+ 
+        public async Task<BaseResponse> RemoveStudentFromTripAsync(RemoveStudentFromTripRequest request)
+        {
+            return await _tripRepository.RemoveStudentFromTripAsync(request.TripId, request.StudentId);
+        }
     }
 }
