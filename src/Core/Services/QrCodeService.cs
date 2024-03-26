@@ -34,7 +34,7 @@ namespace Core.Services
                 Data = data
             };
         }
-        
+
         public async Task<ApiResponse<List<StudentWithQrCodeResponse>>> GetParentStudentsAsync(string email)
         {
             var data = await _qrCodeRepository.GetParentStudentsAsync(email);
@@ -44,7 +44,7 @@ namespace Core.Services
                 Data = data
             };
         }
-        
+
         public async Task<ApiResponse<GenerateQrCodeResponse>> CreateQrCodeAsync(GenerateQrCodeRequest request)
         {
             var response = new ApiResponse<GenerateQrCodeResponse>();
@@ -79,7 +79,8 @@ namespace Core.Services
             response.Data = new GenerateQrCodeResponse()
             {
                 QrCodeId = newQrCode.Id,
-                QrCodeData = $"mystar_{newQrCode.UserEmail}_{newQrCode.StudentId}_{newQrCode.Created}"
+                QrCodeData = $"mystar:{newQrCode.Id}"
+                //QrCodeData = $"mystar_{newQrCode.UserEmail}_{newQrCode.StudentId}_{newQrCode.Created}"
             };
 
             return response;
@@ -185,7 +186,8 @@ namespace Core.Services
                 qrCodesResponse.Add(new()
                 {
                     QrCodeId = newQrCode.Id,
-                    QrCodeData = $"mystar_{newQrCode.UserEmail}_{newQrCode.StudentId}_{newQrCode.Created}"
+                    QrCodeData = $"mystar:{newQrCode.Id}"
+                    //QrCodeData = $"mystar_{newQrCode.UserEmail}_{newQrCode.StudentId}_{newQrCode.Created}"
                 });
             }
 
@@ -193,5 +195,51 @@ namespace Core.Services
             return response;
         }
 
+        public async Task<BaseResponse> ScanQrCodeAsync(string qrCodeData, string user)
+        {
+            var response = new BaseResponse();
+
+            string[] parts = qrCodeData.Split(':');
+
+            if (!(parts.Length == 2 && Guid.TryParse(parts[1], out Guid qrCodeId)))
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status400BadRequest;
+                response.Message = "Invalid QrCode data";
+                return response;
+            }
+
+            var qrCode = await _qrCodeRepository.GetQrCodeById(qrCodeId);
+            if (qrCode is null)
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status404NotFound;
+                response.Message = "QrCode doesn't exist";
+                return response;
+            }
+
+            if (qrCode.ScannedBy != null)
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status400BadRequest;
+                response.Message = "QrCode has already been scanned";
+                return response;
+            }
+
+            qrCode.ScannedBy = user;
+            qrCode.ScannedTime = DateTime.UtcNow;
+
+            var result = await _qrCodeRepository.EditQrCode(qrCode);
+            if (!result.Status)
+            {
+                response.Status = false;
+                response.Code = ResponseCodes.Status500InternalServerError;
+                response.Message = result.Message;
+                return response;
+            }
+
+            return response;
+
+        }
     }
 }

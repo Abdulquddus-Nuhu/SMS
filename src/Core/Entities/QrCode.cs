@@ -19,5 +19,8 @@ namespace Core.Entities
         public string? AuthorizedUserRelationship { get; set; }
         public string? AuthorizedUserFullName { get; set; }
         public string? AuthorizedUserPhoneNumber { get; set; }
+
+        public string? ScannedBy { get; set; }
+        public DateTime? ScannedTime { get; set; }
     }
 }

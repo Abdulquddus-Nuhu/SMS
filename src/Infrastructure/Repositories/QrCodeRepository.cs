@@ -166,7 +166,7 @@ namespace Infrastructure.Repositories
                 return response;
             }
 
-            response.Message = "Unable to edit qrcode! Please try again";
+            response.Message = "Unable to update/edit qrcode! Please try again";
             response.Status = false;
             response.Code = ResponseCodes.Status500InternalServerError;
 
