@@ -240,5 +240,25 @@ namespace API.Controllers.SPE
         //    return HandleResult(response);
         //}
 
+        [Authorize(Roles = AuthConstants.Roles.STAFF + ", " + AuthConstants.Roles.ADMIN + ", " + AuthConstants.Roles.SUPER_ADMIN)]
+        [SwaggerOperation(
+        Summary = "Scan QrCode Endpoint",
+        Description = "This endpoint scans a qrCode. It requires Staff or Admin privilege",
+        OperationId = "qrCode.scan",
+        Tags = new[] { "QrCodeEndpoints" })
+        ]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
+        [HttpPut("scan-qrcode")]
+        public async Task<ActionResult<BaseResponse>> ScanQrCodeAsync(string qrCodeData)
+        {
+            var response = await _qrCodeService.ScanQrCodeAsync(qrCodeData, User.Identity!.Name ?? string.Empty);
+            return HandleResult(response);
+        }
     }
 }
