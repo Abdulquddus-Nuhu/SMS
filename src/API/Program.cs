@@ -133,6 +133,7 @@ try
     builder.Services.AddTransient<ITripRepository, TripRepository>();
     builder.Services.AddTransient<IStudentRepository, StudentRepository>();
     builder.Services.AddTransient<IBusDriverRepository, BusDriverRepository>();
+    builder.Services.AddTransient<IParentRepository, ParentRepository>();
 
 
     //Services
