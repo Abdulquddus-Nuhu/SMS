@@ -17,12 +17,17 @@ namespace Core.Services
         private readonly ITripRepository _tripRepository;
         private readonly ITripService _tripService;
         private readonly ILogger<QrCodeService> _logger;
-        public QrCodeService(IQrCodeRepository qrCodeRepository, ITripRepository tripRepository, ITripService tripService, ILogger<QrCodeService> logger)
+        private readonly IStudentRepository _studentRepository;
+        private readonly IParentRepository _parentRepository;
+        public QrCodeService(IQrCodeRepository qrCodeRepository, ITripRepository tripRepository, ITripService tripService,
+            ILogger<QrCodeService> logger, IStudentRepository studentRepository, IParentRepository parentRepository)
         {
             _qrCodeRepository = qrCodeRepository;
             _tripRepository = tripRepository;
             _tripService = tripService;
             _logger = logger;
+            _studentRepository = studentRepository;
+            _parentRepository = parentRepository;
         }
 
         public async Task<ApiResponse<List<StudentInSchoolResponse>>> GetTodaysQrCodeAsync(string email)
@@ -195,9 +200,9 @@ namespace Core.Services
             return response;
         }
 
-        public async Task<BaseResponse> ScanQrCodeAsync(string qrCodeData, string user)
+        public async Task<ApiResponse<ScanQrCodeResponse>> ScanQrCodeAsync(string qrCodeData, string user)
         {
-            var response = new BaseResponse();
+            var response = new ApiResponse<ScanQrCodeResponse>();
 
             string[] parts = qrCodeData.Split(':');
 
@@ -236,6 +241,37 @@ namespace Core.Services
                 response.Code = ResponseCodes.Status500InternalServerError;
                 response.Message = result.Message;
                 return response;
+            }
+
+            var student = await _studentRepository.GetByIdAsync(qrCode.StudentId);
+            if (student is null)
+            {
+                //do something
+            }
+
+            response.Data = new ScanQrCodeResponse
+            {
+                Grade = student.Grade.Name,
+                Photo = student.PhotoUrl,
+                FullName = student.FullName,
+                InTimer = qrCode.PickUpTime,
+                OutTimer = qrCode.DropOffTime,
+                IsAuthorizedUserParent = qrCode.AuthorizedUser == Shared.Enums.AuthorizedUserType.Self ? true : false,
+            };
+
+            if (!response.Data.IsAuthorizedUserParent)
+            {
+                response.Data.AuthorizedUser = qrCode.AuthorizedUserFullName;
+            }
+            else
+            {
+                var parent = await _parentRepository.GetByEmailAsync(qrCode.UserEmail ?? string.Empty);
+                if (parent is null)
+                {
+                    //do something
+                }
+
+                response.Data.AuthorizedUser = parent.FullName;
             }
 
             return response;

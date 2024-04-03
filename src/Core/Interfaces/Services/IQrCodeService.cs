@@ -16,6 +16,6 @@ namespace Core.Interfaces.Services
         public Task<BaseResponse> AuthorizeQrCode(AuthorizeQrCodeRequest request);
         public Task<ApiResponse<List<StudentWithQrCodeResponse>>> GetParentStudentsAsync(string email);
         public Task<ApiResponse<List<GenerateQrCodeResponse>>> GenerateQrCodesForTripAsync(Guid tripId, string busDriverEmail);
-        public  Task<BaseResponse> ScanQrCodeAsync(string qrCodeData, string user);
+        public Task<ApiResponse<ScanQrCodeResponse>> ScanQrCodeAsync(string qrCodeData, string user);
     }
 }

@@ -86,14 +86,14 @@ namespace API.Controllers.SPE
         Tags = new[] { "QrCodeEndpoints" })
         ]
         [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<ScanQrCodeResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
         [HttpPut("scan-qrcode")]
-        public async Task<ActionResult<BaseResponse>> ScanQrCodeAsync(string qrCodeData)
+        public async Task<ActionResult<ApiResponse<ScanQrCodeResponse>>> ScanQrCodeAsync(string qrCodeData)
         {
             var response = await _qrCodeService.ScanQrCodeAsync(qrCodeData, User.Identity!.Name ?? string.Empty);
             return HandleResult(response);

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Core.Interfaces.Repositories
 {
-    public interface IStudentRepository
+    public interface IParentRepository
     {
-        public IQueryable<Student> GetStudentsWithBusServiceAsync(Guid busId);
-        public Task<Student?> GetByIdAsync(Guid id);
+        public Task<Parent?> GetByIdAsync(Guid id);
+        public Task<Parent?> GetByEmailAsync(string email);
     }
 }

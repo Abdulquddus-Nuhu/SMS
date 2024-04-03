@@ -1,4 +1,5 @@
-﻿using Core.Entities.Users;
+﻿using Core.Entities;
+using Core.Entities.Users;
 using Core.Interfaces.Repositories;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,11 @@ namespace Infrastructure.Repositories
                 .Include(x => x.Grade)
                 .Where(x => x.BusId == busId)
                 .AsNoTracking();
+        }
+
+        public async Task<Student?> GetByIdAsync(Guid id)
+        {
+            return await _dbContext.Students.Include(t => t.Grade).FirstOrDefaultAsync(t => t.Id == id);
         }
 
 
