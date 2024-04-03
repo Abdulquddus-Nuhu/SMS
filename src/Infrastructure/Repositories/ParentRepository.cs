@@ -1,4 +1,5 @@
 ﻿using Core.Entities.Users;
+using Core.Interfaces.Repositories;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
-    public class ParentRepository
+    public class ParentRepository : IParentRepository
     {
         private readonly AppDbContext _dbContext;
         private readonly ILogger<ParentRepository> _logger;
